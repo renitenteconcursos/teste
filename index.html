@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Renitente Concursos - Plataforma de Estudos</title>
+  <!-- Dependências carregadas via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/babel-standalone@7.22.9/babel.min.js" defer></script>
+  <script src="https://cdn.tailwindcss.com" defer></script>
+  <style>
+    /* Animações personalizadas */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .fade-in { animation: fadeIn 0.5s ease-in; }
+    .spin { animation: spin 1s linear infinite; }
+    .sidebar { transition: all 0.3s ease; }
+    .sidebar:hover { box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+    .card { transition: transform 0.2s ease; }
+    .card:hover { transform: translateY(-5px); }
+    /* Estilo básico para fallback */
+    body { font-family: Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; }
+  </style>
+</head>
+<body>
+  <!-- Container principal -->
+  <div id="root"></div>
+  <!-- Fallback caso o React falhe -->
+  <div id="fallback" style="display: none; text-align: center; padding: 20px;">
+    <h1 style="color: #dc2626; font-size: 24px;">Erro ao Carregar a Plataforma</h1>
+    <p style="color: #374151; font-size: 16px;">Não foi possível carregar o Renitente Concursos. Verifique sua conexão com a internet e recarregue a página.</p>
+  </div>
+
+  <script type="text/babel">
+    // Função de log para debugging
+    const log = (message, type = "info") => {
+      const styles = {
+        info: "color: blue;",
+        error: "color: red;",
+        warn: "color: orange;"
+      };
+      console.log(`%c[Renitente] ${message}`, styles[type]);
+    };
+
+    // Verificação inicial de dependências
+    window.onload = () => {
+      log("Iniciando verificação de dependências...");
+      const dependencies = {
+        React: typeof React !== "undefined",
+        ReactDOM: typeof ReactDOM !== "undefined",
+        Babel: typeof Babel !== "undefined",
+        Tailwind: typeof tailwind !== "undefined"
+      };
+
+      let allLoaded = true;
+      for (const [dep, loaded] of Object.entries(dependencies)) {
+        if (!loaded) {
+          log(`${dep} não carregado!`, "error");
+          allLoaded = false;
+        } else {
+          log(`${dep} carregado com sucesso.`, "info");
+        }
+      }
+
+      if (!allLoaded) {
+        document.getElementById("root").style.display = "none";
+        document.getElementById("fallback").style.display = "block";
+        return;
+      }
+
+      log("Todas as dependências carregadas. Renderizando aplicação...", "info");
+      renderApp();
+    };
+
+    // Dados das disciplinas, assuntos e questões (10 por assunto)
+    const content = {
+      "Língua Portuguesa": {
+        "Leitura e Compreensão": {
+          questions: [
+            { id: 1, question: "O que é essencial para a compreensão de um texto?", options: ["Velocidade", "Contexto", "Tamanho", "Fonte"], answer: "Contexto" },
+            { id: 2, question: "Qual é o objetivo principal da leitura interpretativa?", options: ["Memorizar", "Analisar ideias", "Escrever", "Copiar"], answer: "Analisar ideias" },
+            { id: 3, question: "O que caracteriza um texto coeso?", options: ["Frases soltas", "Nexos claros", "Repetições", "Erros"], answer: "Nexos claros" },
+            { id: 4, question: "Como identificar a ideia principal?", options: ["Primeira frase", "Tema recorrente", "Última frase", "Detalhes"], answer: "Tema recorrente" },
+            { id: 5, question: "O que é um parágrafo bem estruturado?", options: ["Lista de palavras", "Bloco com unidade", "Texto aleatório", "Frase longa"], answer: "Bloco com unidade" },
+            { id: 6, question: "Qual elemento melhora a leitura?", options: ["Vocabulário", "Distração", "Ruído", "Falta de foco"], answer: "Vocabulário" },
+            { id: 7, question: "O que é interpretação ativa?", options: ["Ler rápido", "Questionar o texto", "Ignorar detalhes", "Copiar"], answer: "Questionar o texto" },
+            { id: 8, question: "Por que usamos conectivos?", options: ["Enfeitar", "Ligar ideias", "Confundir", "Separar"], answer: "Ligar ideias" },
+            { id: 9, question: "Qual é o foco da compreensão?", options: ["Letras", "Sentido", "Estilo", "Som"], answer: "Sentido" },
+            { id: 10, question: "O que dificulta a interpretação?", options: ["Clareza", "Ambiguidade", "Estrutura", "Exemplos"], answer: "Ambiguidade" }
+          ]
+        },
+        "Acentuação Gráfica": {
+          questions: [
+            { id: 1, question: "Qual sílaba é tônica em 'rádio'?", options: ["Rá", "Di", "O", "Rad"], answer: "Rá" },
+            { id: 2, question: "Por que 'pássaro' tem acento?", options: ["Oxítona", "Paroxítona com ditongo", "Proparoxítona", "Monossílabo"], answer: "Paroxítona com ditongo" },
+            { id: 3, question: "Qual regra se aplica a 'saúde'?", options: ["Oxítona", "Paroxítona com ditongo", "Proparoxítona", "Sem acento"], answer: "Paroxítona com ditongo" },
+            { id: 4, question: "Por que 'herói' tem acento?", options: ["Oxítona em 'i'", "Paroxítona", "Proparoxítona", "Ditongo"], answer: "Oxítona em 'i'" },
+            { id: 5, question: "Qual palavra está correta?", options: ["Cafe", "Café", "Cáfe", "Caffé"], answer: "Café" },
+            { id: 6, question: "Qual é a tonicidade de 'sabedoria'?", options: ["Oxítona", "Paroxítona", "Proparoxítona", "Sem tonicidade"], answer: "Proparoxítona" },
+            { id: 7, question: "Por que 'árvore' tem acento?", options: ["Oxítona", "Paroxítona", "Proparoxítona", "Ditongo"], answer: "Proparoxítona" },
+            { id: 8, question: "Qual palavra não leva acento?", options: ["Fazer", "Pé", "Mão", "Céu"], answer: "Fazer" },
+            { id: 9, question: "Qual é a sílaba tônica de 'fácil'?", options: ["Fa", "Cil", "Fá", "Ci"], answer: "Fá" },
+            { id: 10, question: "Por que 'júri' tem acento?", options: ["Oxítona em 'i'", "Paroxítona", "Proparoxítona", "Ditongo"], answer: "Oxítona em 'i'" }
+          ]
+        },
+        "Coordenação e Subordinação": {
+          questions: [
+            { id: 1, question: "O que caracteriza a coordenação?", options: ["Dependência", "Independência", "Subordinação", "Oposição"], answer: "Independência" },
+            { id: 2, question: "Qual conjunção indica subordinação?", options: ["E", "Mas", "Porque", "Ou"], answer: "Porque" },
+            { id: 3, question: "Qual é uma oração coordenada?", options: ["Choveu porque saí", "Choveu, mas saí", "Choveu para sair", "Choveu"], answer: "Choveu, mas saí" },
+            { id: 4, question: "O que é subordinação?", options: ["Ideias iguais", "Ideias dependentes", "Ideias opostas", "Ideias soltas"], answer: "Ideias dependentes" },
+            { id: 5, question: "Qual é a função de 'e' em 'Saí e corri'?", options: ["Oposição", "Adição", "Causa", "Conclusão"], answer: "Adição" },
+            { id: 6, question: "Qual oração é subordinada?", options: ["Eu corri", "Que eu vi", "Saí rápido", "E choveu"], answer: "Que eu vi" },
+            { id: 7, question: "O que caracteriza 'mas'?", options: ["Adição", "Oposição", "Causa", "Explicação"], answer: "Oposição" },
+            { id: 8, question: "Qual é a relação em 'Saí porque choveu'?", options: ["Adição", "Causa", "Oposição", "Conclusão"], answer: "Causa" },
+            { id: 9, question: "O que conecta orações coordenadas?", options: ["Verbos", "Conjunções coordenativas", "Adjetivos", "Pronomes"], answer: "Conjunções coordenativas" },
+            { id: 10, question: "Qual é uma oração independente?", options: ["Que eu vi", "Saí rápido", "Porque choveu", "Embora esteja cansado"], answer: "Saí rápido" }
+          ]
+        }
+      },
+      "Raciocínio Lógico": {
+        "Estrutura Lógica": {
+          questions: [
+            { id: 1, question: "Se A implica B e B é falso, o que é A?", options: ["Verdadeiro", "Falso", "Indeterminado", "Nulo"], answer: "Falso" },
+            { id: 2, question: "Se todos os gatos são pretos e X é gato, X é...?", options: ["Branco", "Preto", "Cinza", "Indefinido"], answer: "Preto" },
+            { id: 3, question: "Qual é o próximo: 1, 3, 6, 10?", options: ["12", "15", "18", "21"], answer: "15" },
+            { id: 4, question: "Se A ou B é verdadeiro e A é falso, B é...?", options: ["Verdadeiro", "Falso", "Indeterminado", "Nulo"], answer: "Verdadeiro" },
+            { id: 5, question: "O que é um conjunto vazio?", options: ["Sem elementos", "Com 1 elemento", "Com todos", "Com alguns"], answer: "Sem elementos" },
+            { id: 6, question: "Qual é o contrário de 'Se chove, molha'?", options: ["Não chove, não molha", "Chove, não molha", "Molha, chove", "Não molha, chove"], answer: "Chove, não molha" },
+            { id: 7, question: "Quantos lados tem um triângulo?", options: ["2", "3", "4", "5"], answer: "3" },
+            { id: 8, question: "Se 5 pessoas apertam as mãos, quantos apertos?", options: ["5", "10", "15", "20"], answer: "10" },
+            { id: 9, question: "Qual o próximo: 1, 4, 9, 16?", options: ["20", "25", "30", "36"], answer: "25" },
+            { id: 10, question: "O que é discriminação de elementos?", options: ["Somar", "Separar", "Multiplicar", "Dividir"], answer: "Separar" }
+          ]
+        },
+        "Raciocínio Matemático": {
+          questions: [
+            { id: 1, question: "Quanto é 3 + 5 x 2?", options: ["16", "13", "11", "10"], answer: "13" },
+            { id: 2, question: "Se 2x = 10, qual é x?", options: ["2", "5", "10", "20"], answer: "5" },
+            { id: 3, question: "Qual é 10% de 50?", options: ["5", "10", "15", "20"], answer: "5" },
+            { id: 4, question: "Qual a área de um quadrado de lado 4?", options: ["8", "12", "16", "20"], answer: "16" },
+            { id: 5, question: "Se x + 3 = 7, qual é x?", options: ["2", "3", "4", "5"], answer: "4" },
+            { id: 6, question: "Qual a soma dos ângulos de um triângulo?", options: ["90°", "180°", "270°", "360°"], answer: "180°" },
+            { id: 7, question: "Quanto é 15 - 3 x 2?", options: ["24", "12", "9", "6"], answer: "9" },
+            { id: 8, question: "Se 3y = 12, qual é y?", options: ["2", "3", "4", "5"], answer: "4" },
+            { id: 9, question: "Qual é 25% de 80?", options: ["10", "15", "20", "25"], answer: "20" },
+            { id: 10, question: "Qual o perímetro de um retângulo 3x5?", options: ["8", "15", "16", "20"], answer: "16" }
+          ]
+        }
+      },
+      "Atualidades": {
+        "Meio Ambiente e Sociedade": {
+          questions: [
+            { id: 1, question: "O que é uma política pública ambiental?", options: ["Ação privada", "Ação governamental", "ONG", "Campanha"], answer: "Ação governamental" },
+            { id: 2, question: "Qual é um problema ambiental global?", options: ["Desmatamento local", "Mudança climática", "Poluição urbana", "Seca"], answer: "Mudança climática" },
+            { id: 3, question: "O que é uma ONG?", options: ["Empresa estatal", "Organização não governamental", "Agência pública", "Grupo militar"], answer: "Organização não governamental" },
+            { id: 4, question: "Qual é um aspecto local do meio ambiente?", options: ["Aquecimento global", "Desmatamento regional", "Efeito estufa", "Degelo"], answer: "Desmatamento regional" },
+            { id: 5, question: "O que ajuda na sustentabilidade?", options: ["Desperdício", "Reciclagem", "Poluição", "Consumo"], answer: "Reciclagem" },
+            { id: 6, question: "Qual é uma consequência da poluição?", options: ["Saúde melhor", "Doenças", "Economia forte", "Clima estável"], answer: "Doenças" },
+            { id: 7, question: "O que é desenvolvimento sustentável?", options: ["Crescimento sem limites", "Equilíbrio ambiental", "Exploração total", "Industrialização"], answer: "Equilíbrio ambiental" },
+            { id: 8, question: "Qual é um recurso renovável?", options: ["Petróleo", "Carvão", "Água", "Gás"], answer: "Água" },
+            { id: 9, question: "O que combate a mudança climática?", options: ["Desmatamento", "Reflorestamento", "Poluição", "Queimadas"], answer: "Reflorestamento" },
+            { id: 10, question: "Qual é um impacto social da seca?", options: ["Crescimento", "Migração", "Riqueza", "Estabilidade"], answer: "Migração" }
+          ]
+        }
+      },
+      "História do Ceará": {
+        "Período Colonial": {
+          questions: [
+            { id: 1, question: "Qual era a base da economia colonial no Ceará?", options: ["Mineração", "Pecuária", "Agricultura", "Comércio"], answer: "Pecuária" },
+            { id: 2, question: "O que eram sesmarias?", options: ["Impostos", "Terras doadas", "Mercados", "Fazendas"], answer: "Terras doadas" },
+            { id: 3, question: "Quem disputava o território no Ceará colonial?", options: ["Nativos e portugueses", "Espanhóis", "Franceses", "Ingleses"], answer: "Nativos e portugueses" },
+            { id: 4, question: "Qual era o foco das sesmarias?", options: ["Comércio", "Pecuária", "Mineração", "Pesca"], answer: "Pecuária" },
+            { id: 5, question: "O que dificultava a ocupação do Ceará?", options: ["Clima", "Nativos", "Falta de água", "Tudo isso"], answer: "Tudo isso" },
+            { id: 6, question: "Qual era a principal atividade econômica?", options: ["Agricultura", "Pecuária", "Pesca", "Mineração"], answer: "Pecuária" },
+            { id: 7, question: "Quem concedia as sesmarias?", options: ["Rei", "Igreja", "Nativos", "Colonos"], answer: "Rei" },
+            { id: 8, question: "O que marcava a economia colonial?", options: ["Exportação", "Subsistência", "Indústria", "Comércio"], answer: "Subsistência" },
+            { id: 9, question: "Qual era um desafio dos colonos?", options: ["Falta de ouro", "Resistência nativa", "Clima ameno", "Excesso de água"], answer: "Resistência nativa" },
+            { id: 10, question: "O que os portugueses buscavam no Ceará?", options: ["Ouro", "Terras", "Escravos", "Comércio"], answer: "Terras" }
+          ]
+        }
+      },
+      "Administração Pública": {
+        "Características das Organizações": {
+          questions: [
+            { id: 1, question: "O que é uma estrutura organizacional?", options: ["Plano de vendas", "Hierarquia", "Reunião", "Contrato"], answer: "Hierarquia" },
+            { id: 2, question: "Qual é um tipo de departamentalização?", options: ["Por função", "Por idade", "Por cor", "Por tamanho"], answer: "Por função" },
+            { id: 3, question: "O que define uma organização formal?", options: ["Regras claras", "Informalidade", "Desordem", "Improviso"], answer: "Regras claras" },
+            { id: 4, question: "Qual é a função do planejamento?", options: ["Executar", "Definir metas", "Controlar", "Avaliar"], answer: "Definir metas" },
+            { id: 5, question: "O que é centralização?", options: ["Decisões no topo", "Decisões distribuídas", "Falta de controle", "Autonomia"], answer: "Decisões no topo" },
+            { id: 6, question: "Qual é um critério de departamentalização?", options: ["Cor", "Produto", "Tamanho", "Idade"], answer: "Produto" },
+            { id: 7, question: "O que é administração direta?", options: ["Órgãos públicos", "Empresas privadas", "ONGs", "Autarquias"], answer: "Órgãos públicos" },
+            { id: 8, question: "Qual é o objetivo do controle?", options: ["Planejar", "Corrigir desvios", "Executar", "Treinar"], answer: "Corrigir desvios" },
+            { id: 9, question: "O que é desconcentração?", options: ["Divisão interna", "Centralização", "Terceirização", "Autonomia"], answer: "Divisão interna" },
+            { id: 10, question: "Qual é uma característica moderna das organizações?", options: ["Flexibilidade", "Rigidez", "Desordem", "Isolamento"], answer: "Flexibilidade" }
+          ]
+        }
+      },
+      "Direito Constitucional": {
+        "Direitos e Garantias Fundamentais": {
+          questions: [
+            { id: 1, question: "O que são direitos sociais?", options: ["Voto", "Educação e saúde", "Propriedade", "Liberdade"], answer: "Educação e saúde" },
+            { id: 2, question: "Quem tem direitos políticos?", options: ["Cidadãos", "Estrangeiros", "Menores", "Empresas"], answer: "Cidadãos" },
+            { id: 3, question: "Qual é um direito individual?", options: ["Educação", "Liberdade", "Saúde", "Voto"], answer: "Liberdade" },
+            { id: 4, question: "O que garante a Constituição de 1988?", options: ["Monarquia", "Direitos fundamentais", "Ditadura", "Centralização"], answer: "Direitos fundamentais" },
+            { id: 5, question: "Qual é um dever do cidadão?", options: ["Votar", "Trabalhar", "Estudar", "Viajar"], answer: "Votar" },
+            { id: 6, question: "O que é um direito coletivo?", options: ["Liberdade", "Saúde", "Meio ambiente equilibrado", "Propriedade"], answer: "Meio ambiente equilibrado" },
+            { id: 7, question: "Quem pode exercer o voto?", options: ["Menores de 16", "Cidadãos maiores de 16", "Estrangeiros", "Presos"], answer: "Cidadãos maiores de 16" },
+            { id: 8, question: "Qual é um direito social básico?", options: ["Liberdade", "Moradia", "Propriedade", "Expressão"], answer: "Moradia" },
+            { id: 9, question: "O que protege os direitos fundamentais?", options: ["Lei ordinária", "Constituição", "Decreto", "Portaria"], answer: "Constituição" },
+            { id: 10, question: "Qual é um direito político?", options: ["Educação", "Voto", "Saúde", "Liberdade"], answer: "Voto" }
+          ]
+        }
+      },
+      "Direitos Humanos": {
+        "Conceito e Fundamentação": {
+          questions: [
+            { id: 1, question: "O que são Direitos Humanos?", options: ["Leis locais", "Garantias universais", "Regras empresariais", "Normas culturais"], answer: "Garantias universais" },
+            { id: 2, question: "Qual é a base dos Direitos Humanos na CRFB/88?", options: ["Economia", "Dignidade humana", "Poder", "Religião"], answer: "Dignidade humana" },
+            { id: 3, question: "Quem deve garantir os Direitos Humanos?", options: ["Indivíduos", "Estado", "Empresas", "ONGs"], answer: "Estado" },
+            { id: 4, question: "O que é um direito inalienável?", options: ["Pode ser vendido", "Não pode ser retirado", "É temporário", "É opcional"], answer: "Não pode ser retirado" },
+            { id: 5, question: "Qual é um exemplo de Direito Humano?", options: ["Lucro", "Vida", "Comércio", "Poder"], answer: "Vida" },
+            { id: 6, question: "O que fundamenta os Direitos Humanos?", options: ["Leis locais", "Igualdade", "Hierarquia", "Comércio"], answer: "Igualdade" },
+            { id: 7, question: "Qual é o foco da Política Nacional de Direitos Humanos?", options: ["Economia", "Proteção universal", "Segurança", "Educação"], answer: "Proteção universal" },
+            { id: 8, question: "O que é violação de Direitos Humanos?", options: ["Respeito", "Abuso de direitos", "Leis justas", "Igualdade"], answer: "Abuso de direitos" },
+            { id: 9, question: "Qual documento protege os Direitos Humanos?", options: ["Constituição", "Contrato", "Regulamento", "Estatuto"], answer: "Constituição" },
+            { id: 10, question: "O que é responsabilidade do Estado?", options: ["Lucro", "Garantir direitos", "Comércio", "Expansão"], answer: "Garantir direitos" }
+          ]
+        }
+      }
+    };
+
+    // Componente de Carregamento
+    function Loading() {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full spin mx-auto mb-4"></div>
+            <p className="text-gray-700 text-lg">Carregando Renitente Concursos...</p>
+          </div>
+        </div>
+      );
+    }
+
+    // Componente de Login
+    function Login({ onLogin }) {
+      const [username, setUsername] = useState("");
+      const [password, setPassword] = useState("");
+      const [error, setError] = useState("");
+      const [loading, setLoading] = useState(false);
+
+      const handleLogin = () => {
+        setLoading(true);
+        setError("");
+        log(`Tentativa de login com usuário: ${username}`, "info");
+
+        const users = JSON.parse(localStorage.getItem("users")) || { "aluno": "12345" };
+        if (!username || !password) {
+          setError("Preencha todos os campos!");
+          setLoading(false);
+          log("Campos obrigatórios não preenchidos", "warn");
+          return;
+        }
+
+        setTimeout(() => { // Simula delay de autenticação
+          if (users[username] === password) {
+            log(`Login bem-sucedido para ${username}`, "info");
+            onLogin(username);
+          } else if (!users[username]) {
+            localStorage.setItem("users", JSON.stringify({ ...users, [username]: password }));
+            log(`Novo usuário ${username} criado`, "info");
+            onLogin(username);
+          } else {
+            setError("Senha incorreta!");
+            log("Senha incorreta fornecida", "error");
+          }
+          setLoading(false);
+        }, 1000);
+      };
+
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-200">
+          <div className="bg-white p-10 rounded-xl shadow-2xl w-full max-w-lg fade-in">
+            <h1 className="text-4xl font-bold text-center text-blue-700 mb-8">Renitente Concursos</h1>
+            <p className="text-center text-gray-600 mb-6">Faça login para acessar sua plataforma de estudos</p>
+            <input
+              type="text"
+              placeholder="Usuário"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              className="w-full p-4 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+              disabled={loading}
+            />
+            <input
+              type="password"
+              placeholder="Senha"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="w-full p-4 mb-6 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+              disabled={loading}
+            />
+            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+            <button
+              onClick={handleLogin}
+              className={`w-full p-4 rounded-lg text-white font-semibold ${
+                loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-700 hover:bg-blue-800"
+              } transition duration-300`}
+              disabled={loading}
+            >
+              {loading ? "Entrando..." : "Entrar"}
+            </button>
+            <p className="text-center text-gray-500 mt-4">Primeiro acesso? Use qualquer usuário e senha para criar uma conta!</p>
+          </div>
+        </div>
+      );
+    }
+
+    // Componente de Cabeçalho
+    function Header({ user, onLogout }) {
+      return (
+        <header className="fixed top-0 left-0 right-0 bg-blue-800 text-white p-4 flex justify-between items-center shadow-md z-10">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-2xl font-bold">Renitente Concursos</h1>
+            <span className="text-sm bg-blue-600 px-2 py-1 rounded-full">v1.0</span>
+          </div>
+          <div className="flex items-center space-x-4">
+            <span className="text-sm">Bem-vindo, {user}</span>
+            <button
+              onClick={onLogout}
+              className="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition duration-300 font-semibold"
+            >
+              Sair
+            </button>
+          </div>
+        </header>
+      );
+    }
+
+    // Componente de Sidebar
+    function Sidebar({ activeSection, setActiveSection }) {
+      const sections = [
+        { id: "dashboard", label: "Dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
+        { id: "videos", label: "Vídeo Aulas", icon: "M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" },
+        { id: "questions", label: "Questões", icon: "M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
+        { id: "progress", label: "Progresso", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" }
+      ];
+
+      return (
+        <div className="w-72 bg-blue-900 text-white fixed h-full pt-20 p-6 sidebar">
+          <nav className="space-y-6">
+            {sections.map(section => (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                className={`w-full flex items-center p-4 rounded-lg font-semibold ${
+                  activeSection === section.id ? "bg-blue-700" : "hover:bg-blue-800"
+                } transition duration-200`}
+              >
+                <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={section.icon} />
+                </svg>
+                {section.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+      );
+    }
+
+    // Componente de Breadcrumbs
+    function Breadcrumbs({ discipline, topic, question, onBack }) {
+      return (
+        <div className="flex items-center space-x-2 text-gray-600 mb-6">
+          <button onClick={() => onBack("dashboard")} className="hover:underline">Dashboard</button>
+          {discipline && (
+            <>
+              <span>›</span>
+              <button onClick={() => onBack("discipline")} className="hover:underline">{discipline}</button>
+            </>
+          )}
+          {topic && (
+            <>
+              <span>›</span>
+              <button onClick={() => onBack("topic")} className="hover:underline">{topic}</button>
+            </>
+          )}
+          {question !== null && (
+            <>
+              <span>›</span>
+              <span className="text-gray-800 font-semibold">Questão {question + 1}</span>
+            </>
+          )}
+        </div>
+      );
+    }
+
+    // Componente de Questão
+    function Question({ topic, question, onAnswer, studentData }) {
+      const [selected, setSelected] = useState(null);
+      const [answered, setAnswered] = useState(studentData.questionScores[`${topic}-${question.id}`] !== undefined);
+
+      useEffect(() => {
+        const isAnswered = studentData.questionScores[`${topic}-${question.id}`] !== undefined;
+        setAnswered(isAnswered);
+        setSelected(isAnswered ? (studentData.questionScores[`${topic}-${question.id}`] === 1 ? question.answer : studentData.selectedAnswers?.[`${topic}-${question.id}`]) : null);
+        log(`Questão ${question.id} carregada. Respondida: ${isAnswered}`, "info");
+      }, [question.id, studentData]);
+
+      const handleSelect = (option) => {
+        if (!answered) {
+          setSelected(option);
+          setAnswered(true);
+          const isCorrect = option === question.answer;
+          onAnswer(option, isCorrect);
+          log(`Resposta selecionada para questão ${question.id}: ${option} (${isCorrect ? "Correto" : "Errado"})`, "info");
+        }
+      };
+
+      return (
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <p className="text-lg font-medium text-gray-800 mb-4">{question.question}</p>
+          <ul className="space-y-3">
+            {question.options.map((option, idx) => (
+              <li key={idx}>
+                <button
+                  onClick={() => handleSelect(option)}
+                  className={`w-full p-3 text-left rounded-lg border transition duration-200 ${
+                    !answered
+                      ? "bg-white hover:bg-blue-50"
+                      : option === question.answer
+                      ? "bg-green-100 border-green-500"
+                      : selected === option
+                      ? "bg-red-100 border-red-500"
+                      : "bg-gray-200 opacity-75"
+                  }`}
+                  disabled={answered}
+                >
+                  {option}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+
+    // Componente Principal
+    function App() {
+      const [user, setUser] = useState(null);
+      const [activeSection, setActiveSection] = useState("dashboard");
+      const [studentData, setStudentData] = useState(() => {
+        const saved = localStorage.getItem(`studentData-${user}`);
+        return saved ? JSON.parse(saved) : { videosWatched: {}, questionScores: {}, selectedAnswers: {} };
+      });
+      const [videos, setVideos] = useState(() => {
+        const saved = localStorage.getItem("videos");
+        return saved ? JSON.parse(saved) : {};
+      });
+      const [selectedDiscipline, setSelectedDiscipline] = useState(null);
+      const [selectedTopic, setSelectedTopic] = useState(null);
+      const [currentQuestion, setCurrentQuestion] = useState(null);
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        log("Inicializando aplicação...", "info");
+        setTimeout(() => setLoading(false), 1000); // Simula carregamento inicial
+      }, []);
+
+      useEffect(() => {
+        if (user) {
+          localStorage.setItem(`studentData-${user}`, JSON.stringify(studentData));
+          log(`Dados do usuário ${user} salvos no localStorage`, "info");
+        }
+      }, [studentData, user]);
+
+      const logout = () => {
+        setUser(null);
+        setStudentData({ videosWatched: {}, questionScores: {}, selectedAnswers: {} });
+        setActiveSection("dashboard");
+        setSelectedDiscipline(null);
+        setSelectedTopic(null);
+        setCurrentQuestion(null);
+        log("Usuário deslogado", "info");
+      };
+
+      const markVideoWatched = (discipline, video) => {
+        setStudentData(prev => ({
+          ...prev,
+          videosWatched: { ...prev.videosWatched, [`${discipline}-${video}`]: true }
+        }));
+        log(`Vídeo ${video} marcado como assistido em ${discipline}`, "info");
+      };
+
+      const handleAnswer = (option, isCorrect) => {
+        const question = content[selectedDiscipline][selectedTopic].questions[currentQuestion];
+        setStudentData(prev => ({
+          ...prev,
+          questionScores: { ...prev.questionScores, [`${selectedDiscipline}-${selectedTopic}-${question.id}`]: isCorrect ? 1 : 0 },
+          selectedAnswers: { ...prev.selectedAnswers, [`${selectedDiscipline}-${selectedTopic}-${question.id}`]: option }
+        }));
+      };
+
+      const calculateProgress = (topic) => {
+        const totalQuestions = content[selectedDiscipline][topic].questions.length;
+        const scores = Object.keys(studentData.questionScores)
+          .filter(key => key.startsWith(`${selectedDiscipline}-${topic}`))
+          .map(key => studentData.questionScores[key]);
+        const correct = scores.filter(s => s === 1).length;
+        return totalQuestions > 0 ? ((correct / totalQuestions) * 100).toFixed(2) : 0;
+      };
+
+      const calculateOverallProgress = () => {
+        const allScores = Object.values(studentData.questionScores);
+        const total = allScores.length;
+        const correct = allScores.filter(s => s === 1).length;
+        return total > 0 ? ((correct / total) * 100).toFixed(2) : 0;
+      };
+
+      const handleBack = (level) => {
+        switch (level) {
+          case "dashboard":
+            setActiveSection("dashboard");
+            setSelectedDiscipline(null);
+            setSelectedTopic(null);
+            setCurrentQuestion(null);
+            break;
+          case "discipline":
+            setSelectedDiscipline(null);
+            setSelectedTopic(null);
+            setCurrentQuestion(null);
+            break;
+          case "topic":
+            setSelectedTopic(null);
+            setCurrentQuestion(null);
+            break;
+          default:
+            setCurrentQuestion(null);
+        }
+        log(`Navegação de volta para ${level}`, "info");
+      };
+
+      if (loading) return <Loading />;
+      if (!user) return <Login onLogin={setUser} />;
+
+      return (
+        <div className="min-h-screen flex flex-col">
+          <Header user={user} onLogout={logout} />
+          <div className="flex flex-1 pt-16">
+            <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+            <main className="ml-72 flex-1 p-8 overflow-y-auto bg-gray-100">
+              <div className="max-w-5xl mx-auto">
+                {activeSection === "dashboard" && (
+                  <div className="fade-in">
+                    <h2 className="text-3xl font-bold text-gray-800 mb-6">Bem-vindo ao Renitente Concursos</h2>
+                    <p className="text-gray-600 mb-8">Sua plataforma completa para preparação de concursos públicos. Escolha uma seção no menu lateral para começar seus estudos!</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="bg-white p-6 rounded-lg shadow-md card">
+                        <h3 className="text-xl font-semibold text-blue-700 mb-2">Vídeo Aulas</h3>
+                        <p className="text-gray-600">Acesse conteúdos em vídeo organizados por disciplina para aprofundar seu aprendizado.</p>
+                        <button
+                          onClick={() => setActiveSection("videos")}
+                          className="mt-4 text-blue-600 hover:underline font-semibold"
+                        >
+                          Explorar
+                        </button>
+                      </div>
+                      <div className="bg-white p-6 rounded-lg shadow-md card">
+                        <h3 className="text-xl font-semibold text-blue-700 mb-2">Questões</h3>
+                        <p className="text-gray-600">Pratique com questões detalhadas e receba feedback imediato para melhorar seu desempenho.</p>
+                        <button
+                          onClick={() => setActiveSection("questions")}
+                          className="mt-4 text-blue-600 hover:underline font-semibold"
+                        >
+                          Praticar
+                        </button>
+                      </div>
+                      <div className="bg-white p-6 rounded-lg shadow-md card">
+                        <h3 className="text-xl font-semibold text-blue-700 mb-2">Progresso</h3>
+                        <p className="text-gray-600">Acompanhe seu desempenho detalhado e ajuste seus estudos para alcançar seus objetivos.</p>
+                        <button
+                          onClick={() => setActiveSection("progress")}
+                          className="mt-4 text-blue-600 hover:underline font-semibold"
+                        >
+                          Ver Progresso
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeSection === "videos" && (
+                  <div className="fade-in">
+                    <Breadcrumbs discipline={selectedDiscipline} onBack={handleBack} />
+                    <h2 className="text-3xl font-bold text-gray-800 mb-6">Vídeo Aulas</h2>
+                    {!selectedDiscipline ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {Object.keys(videos).length === 0 ? (
+                          <p className="text-gray-600 col-span-full">Nenhum vídeo disponível. Adicione vídeos no painel de administração.</p>
+                        ) : (
+                          Object.keys(videos).map(discipline => (
+                            <div key={discipline} className="bg-white p-6 rounded-lg shadow-md card">
+                              <button
+                                onClick={() => setSelectedDiscipline(discipline)}
+                                className="text-blue-600 font-semibold hover:underline text-lg"
+                              >
+                                {discipline}
+                              </button>
+                              <p className="text-gray-600 mt-2">{videos[discipline].length} vídeos disponíveis</p>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    ) : (
+                      <div>
+                        <h3 className="text-2xl font-semibold text-gray-700 mb-4">{selectedDiscipline}</h3>
+                        <ul className="space-y-4">
+                          {videos[selectedDiscipline].map(video => (
+                            <li key={video} className="flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow-sm">
+                              <span className="text-gray-700">{video}</span>
+                              <button
+                                onClick={() => markVideoWatched(selectedDiscipline, video)}
+                                className={`px-4 py-2 rounded-lg text-white font-semibold ${
+                                  studentData.videosWatched[`${selectedDiscipline}-${video}`]
+                                    ? "bg-green-400"
+                                    : "bg-green-600 hover:bg-green-700"
+                                } transition duration-200`}
+                              >
+                                {studentData.videosWatched[`${selectedDiscipline}-${video}`] ? "Assistido" : "Marcar como Assistido"}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeSection === "questions" && (
+                  <div className="fade-in">
+                    <Breadcrumbs
+                      discipline={selectedDiscipline}
+                      topic={selectedTopic}
+                      question={currentQuestion}
+                      onBack={handleBack}
+                    />
+                    <h2 className="text-3xl font-bold text-gray-800 mb-6">Questões</h2>
+                    {!selectedDiscipline ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {Object.keys(content).map(discipline => (
+                          <div key={discipline} className="bg-white p-6 rounded-lg shadow-md card">
+                            <button
+                              onClick={() => setSelectedDiscipline(discipline)}
+                              className="text-blue-600 font-semibold hover:underline text-lg"
+                            >
+                              {discipline}
+                            </button>
+                            <p className="text-gray-600 mt-2">{Object.keys(content[discipline]).length} tópicos disponíveis</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : !selectedTopic ? (
+                      <div>
+                        <h3 className="text-2xl font-semibold text-gray-700 mb-4">{selectedDiscipline}</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {Object.keys(content[selectedDiscipline]).map(topic => (
+                            <div key={topic} className="bg-white p-6 rounded-lg shadow-md card">
+                              <button
+                                onClick={() => setSelectedTopic(topic)}
+                                className="text-blue-600 font-semibold hover:underline text-lg"
+                              >
+                                {topic}
+                              </button>
+                              <p className="text-gray-600 mt-2">10 questões disponíveis</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : !currentQuestion && currentQuestion !== 0 ? (
+                      <div>
+                        <h3 className="text-2xl font-semibold text-gray-700 mb-4">{selectedTopic}</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          {content[selectedDiscipline][selectedTopic].questions.map((_, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => setCurrentQuestion(idx)}
+                              className="bg-gray-100 p-4 rounded-lg text-center text-blue-600 hover:bg-blue-50 transition duration-200 font-semibold"
+                            >
+                              Questão {idx + 1}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <h3 className="text-2xl font-semibold text-gray-700 mb-4">{selectedTopic} - Questão {currentQuestion + 1}</h3>
+                        <Question
+                          topic={`${selectedDiscipline}-${selectedTopic}`}
+                          question={content[selectedDiscipline][selectedTopic].questions[currentQuestion]}
+                          onAnswer={handleAnswer}
+                          studentData={studentData}
+                        />
+                        <div className="mt-6 flex justify-between">
+                          <button
+                            onClick={() => setCurrentQuestion(currentQuestion > 0 ? currentQuestion - 1 : 0)}
+                            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition duration-200"
+                            disabled={currentQuestion === 0}
+                          >
+                            Anterior
+                          </button>
+                          <button
+                            onClick={() => setCurrentQuestion(currentQuestion < 9 ? currentQuestion + 1 : 9)}
+                            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition duration-200"
+                            disabled={currentQuestion === 9}
+                          >
+                            Próxima
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeSection === "progress" && (
+                  <div className="fade-in">
+                    <Breadcrumbs onBack={handleBack} />
+                    <h2 className="text-3xl font-bold text-gray-800 mb-6">Seu Progresso</h2>
+                    <div className="space-y-8">
+                      <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-xl font-semibold text-gray-700 mb-4">Vídeo Aulas</h3>
+                        {Object.keys(videos).length === 0 ? (
+                          <p className="text-gray-600">Nenhum vídeo disponível ainda.</p>
+                        ) : (
+                          <ul className="space-y-4">
+                            {Object.keys(videos).map(discipline => (
+                              <li key={discipline} className="bg-gray-50 p-4 rounded-lg">
+                                <span className="font-semibold text-gray-800">{discipline}</span>:{" "}
+                                {Object.keys(studentData.videosWatched).filter(k => k.startsWith(discipline)).length}/{videos[discipline].length} assistidos
+                                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                                  <div
+                                    className="bg-blue-600 h-2.5 rounded-full"
+                                    style={{
+                                      width: `${
+                                        (Object.keys(studentData.videosWatched).filter(k => k.startsWith(discipline)).length /
+                                          videos[discipline].length) * 100
+                                      }%`
+                                    }}
+                                  ></div>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                      <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-xl font-semibold text-gray-700 mb-4">Questões</h3>
+                        <p className="text-lg font-medium text-gray-800 mb-4">
+                          Progresso Geral: {calculateOverallProgress()}% (
+                          {Object.values(studentData.questionScores).filter(s => s === 1).length} acertos,{" "}
+                          {Object.values(studentData.questionScores).filter(s => s === 0).length} erros)
+                        </p>
+                        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                          <div
+                            className="bg-blue-600 h-2.5 rounded-full"
+                            style={{ width: `${calculateOverallProgress()}%` }}
+                          ></div>
+                        </div>
+                        {Object.keys(content).map(discipline => (
+                          <div key={discipline} className="mb-6">
+                            <h4 className="text-lg font-semibold text-gray-800 mb-2">{discipline}</h4>
+                            <ul className="space-y-3">
+                              {Object.keys(content[discipline]).map(topic => (
+                                <li key={topic} className="bg-gray-50 p-4 rounded-lg">
+                                  <span className="font-medium text-gray-700">{topic}</span>: {calculateProgress(topic)}% de acertos
+                                  <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                                    <div
+                                      className="bg-blue-600 h-2.5 rounded-full"
+                                      style={{ width: `${calculateProgress(topic)}%` }}
+                                    ></div>
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </main>
+          </div>
+        </div>
+      );
+    }
+
+    // Função para renderizar a aplicação
+    function renderApp() {
+      try {
+        ReactDOM.render(<App />, document.getElementById("root"));
+        log("Aplicação renderizada com sucesso", "info");
+      } catch (error) {
+        log(`Erro ao renderizar a aplicação: ${error.message}`, "error");
+        document.getElementById("root").innerHTML = `
+          <div class="min-h-screen flex items-center justify-center bg-gray-100">
+            <div class="bg-white p-8 rounded-lg shadow-lg text-center">
+              <h1 class="text-2xl font-bold text-red-600 mb-4">Erro Crítico</h1>
+              <p class="text-gray-700">Ocorreu um erro ao iniciar a plataforma: ${error.message}. Tente recarregar a página.</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
