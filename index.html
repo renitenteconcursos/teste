@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RenitenteConcursos - Prepare-se para o PMCE</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+    <!-- Firebase SDK (versão compatível com HTML puro) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -123,6 +123,17 @@
             border-radius: 10px;
         }
 
+        .access-container input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #E0E0E0;
+            color: #1C2526;
+            font-size: 16px;
+        }
+
         .btn {
             background-color: #00D4FF;
             color: #1C2526;
@@ -134,20 +145,11 @@
             cursor: pointer;
             transition: background-color 0.3s, transform 0.2s;
             margin: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
         }
 
         .btn:hover {
             background-color: #E0E0E0;
             transform: scale(1.05);
-        }
-
-        .google-icon {
-            width: 20px;
-            height: 20px;
         }
 
         .dashboard-section, .content-section {
@@ -415,7 +417,6 @@
                     <li><a href="#">Simulados</a></li>
                     <li><a onclick="showSection('cronograma-section')">Cronogramas</a></li>
                     <li><a onclick="showSection('desempenho-section')">Desempenho</a></li>
-                    <li><a onclick="signOut()">Sair</a></li>
                 </ul>
             </nav>
         </header>
@@ -425,10 +426,9 @@
                 <h2>Conquiste sua vaga na PMCE com a RenitenteConcursos</h2>
                 <p>Milhares de questões, simulados e cursos focados no concurso da Polícia Militar do Ceará.</p>
                 <div class="access-container">
-                    <button class="btn" onclick="signInWithGoogle()">
-                        <img src="https://www.google.com/favicon.ico" alt="Google" class="google-icon">
-                        Entrar com Google
-                    </button>
+                    <input type="text" id="access-code" placeholder="Digite seu Código de Acesso">
+                    <button class="btn" onclick="verifyAccess()">Entrar</button>
+                    <button class="btn" onclick="requestAccessKey()">Receba a Chave de Acesso</button>
                 </div>
             </div>
         </section>
@@ -440,7 +440,7 @@
                     <source src="edital.mp4" type="video/mp4">
                     Seu navegador não suporta o elemento de vídeo.
                 </video>
-                <p class="video-fallback">Se o vídeo não carregar, verifique se o arquivo <code>edital.mp4</code> está no mesmo diretório ou ajuste o caminho.</p>
+                <p class="video-fallback">Se o vídeo não carregar, verifique se o arquivo <code>inicio.mp4</code> está no mesmo diretório que este HTML ou ajuste o caminho no código.</p>
             </div>
             <div class="summary-container">
                 <h3>Resumão Detalhado do Edital PM CE 2025</h3>
@@ -450,7 +450,7 @@
                 <ul>
                     <li><strong>Status:</strong> Edital publicado</li>
                     <li><strong>Banca Organizadora:</strong> CEV/UECE (FUNECE)</li>
-                    <li><strong>Vagas Imediatas:</strong> 1.000 (800 ampla concorrência, 200 PPP)</li>
+                    <li><strong>Vagas Imediatas:</strong> 1.000 (800 ampla concorrência, 200 PPP - Política de Promoção da Igualdade Racial para negros e pardos)</li>
                     <li><strong>Cadastro de Reserva:</strong> 500 (400 ampla concorrência, 100 PPP)</li>
                     <li><strong>Salário Inicial:</strong> R$ 5.568,64 (após curso de formação)</li>
                     <li><strong>Requisitos:</strong> 
@@ -471,46 +471,128 @@
                 <ul>
                     <li><strong>Conhecimentos Básicos (40 questões):</strong>
                         <ul>
-                            <li>Língua Portuguesa (12 questões)</li>
-                            <li>Matemática/Raciocínio Lógico (8 questões)</li>
-                            <li>Atualidades (8 questões)</li>
-                            <li>Informática (6 questões)</li>
-                            <li>Segurança Pública (6 questões)</li>
+                            <li>Língua Portuguesa (12 questões): Interpretação de texto, gramática, ortografia</li>
+                            <li>Matemática/Raciocínio Lógico (8 questões): Operações básicas, porcentagem, lógica</li>
+                            <li>Atualidades (8 questões): Fatos recentes do Brasil e do Ceará</li>
+                            <li>Informática (6 questões): Windows, Office, internet</li>
+                            <li>Segurança Pública (6 questões): Conceitos básicos e legislação</li>
                         </ul>
                     </li>
                     <li><strong>Conhecimentos Específicos (60 questões):</strong>
                         <ul>
-                            <li>Direito Constitucional (15 questões)</li>
-                            <li>Direito Penal (15 questões)</li>
-                            <li>Direito Processual Penal (10 questões)</li>
-                            <li>Legislação Extravagante (10 questões)</li>
-                            <li>Direitos Humanos (10 questões)</li>
+                            <li>Direito Constitucional (15 questões): Direitos fundamentais, organização do Estado</li>
+                            <li>Direito Penal (15 questões): Crimes, penas, Código Penal</li>
+                            <li>Direito Processual Penal (10 questões): Inquérito, prisão, provas</li>
+                            <li>Legislação Extravagante (10 questões): Estatuto da Criança, Lei Maria da Penha</li>
+                            <li>Direitos Humanos (10 questões): Declaração Universal, tratados</li>
                         </ul>
                     </li>
                 </ul>
-                <p><strong>Pontuação Mínima:</strong> 50% em cada bloco.</p>
+                <p><strong>Pontuação Mínima:</strong> 20 acertos em Conhecimentos Básicos (50%) e 30 em Conhecimentos Específicos (50%). Cada questão vale 1 ponto.</p>
+
+                <h3>Etapas do Concurso</h3>
+                <p>O concurso possui <strong>5 etapas</strong>, todas eliminatórias, exceto a prova objetiva, que também classifica:</p>
+                <ul>
+                    <li><strong>1. Prova Objetiva:</strong> 100 questões, conforme detalhado acima.</li>
+                    <li><strong>2. Exame de Saúde:</strong> Avaliação médica, odontológica e toxicológica.
+                        <ul>
+                            <li>Exames exigidos: Hemograma, glicemia, exame de urina, audiometria, oftalmológico, entre outros.</li>
+                            <li>Candidatos com tatuagens visíveis podem ser avaliados caso representem apologia a crimes ou violência.</li>
+                        </ul>
+                    </li>
+                    <li><strong>3. Avaliação Psicológica:</strong> Testes psicotécnicos para verificar:
+                        <ul>
+                            <li>Controle emocional e impulsividade</li>
+                            <li>Capacidade de raciocínio e concentração</li>
+                            <li>Perfil de liderança e trabalho em equipe</li>
+                            <li>Aptidão para lidar com situações de estresse</li>
+                        </ul>
+                        <p>Baseada em testes como PMK, Palográfico e entrevistas (quando necessário).</p>
+                    </li>
+                    <li><strong>4. Teste de Aptidão Física (TAF):</strong> Composto por 4 exercícios com índices mínimos:
+                        <ul>
+                            <li><strong>Corrida de 12 minutos:</strong>
+                                <ul>
+                                    <li>Homens: 2.400 metros</li>
+                                    <li>Mulheres: 2.000 metros</li>
+                                </ul>
+                            </li>
+                            <li><strong>Barra:</strong>
+                                <ul>
+                                    <li>Homens: 6 repetições dinâmicas (subir e descer completamente)</li>
+                                    <li>Mulheres: 10 segundos em suspensão estática</li>
+                                </ul>
+                            </li>
+                            <li><strong>Abdominal:</strong> Tipo <em>remador</em> (deitado, tronco elevado a 45º, mãos na nuca):
+                                <ul>
+                                    <li>Homens: 42 repetições em 1 minuto</li>
+                                    <li>Mulheres: 38 repetições em 1 minuto</li>
+                                </ul>
+                            </li>
+                            <li><strong>Corrida de 50 metros:</strong>
+                                <ul>
+                                    <li>Homens: Até 9 segundos</li>
+                                    <li>Mulheres: Até 10 segundos</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p>Candidatos têm duas tentativas por exercício, exceto na corrida de 12 minutos (uma tentativa).</p>
+                    </li>
+                    <li><strong>5. Investigação Social:</strong> Análise da vida pregressa e idoneidade moral.
+                        <ul>
+                            <li>Verifica antecedentes criminais, processos judiciais e comportamento social.</li>
+                            <li>Documentos como certidões negativas são exigidos.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3>Curso de Formação</h3>
+                <p>Aprovados em todas as etapas passam pelo <strong>Curso de Formação Profissional</strong>, com duração de cerca de 6 meses, em regime de dedicação exclusiva. Durante o curso, recebem uma bolsa de aproximadamente 50% do salário inicial.</p>
+
+                <p><strong>Grupo de Estudos:</strong> Acesse agora o <a href="#" style="color: #00D4FF;">Grupo de Estudos para o Concurso PM CE</a> e prepare-se com quem entende do assunto!</p>
             </div>
         </section>
 
         <section class="content-section" id="sobre-nos">
             <h2>Sobre Nós</h2>
-            <p>A RenitenteConcursos é uma plataforma dedicada à preparação para concursos públicos, com foco no Concurso da Polícia Militar do Ceará (PM CE).</p>
+            <p>A RenitenteConcursos é uma plataforma dedicada à preparação de candidatos para concursos públicos, com foco especial no Concurso da Polícia Militar do Ceará (PM CE). Nosso objetivo é oferecer ferramentas práticas e conteúdos atualizados para que você conquiste sua vaga com confiança.</p>
+            <p>Fundada por uma equipe de especialistas em concursos públicos, a RenitenteConcursos nasceu da percepção de que muitos candidatos precisam de um suporte direcionado e acessível. Aqui, você encontra vídeos explicativos, resumos detalhados de editais e uma abordagem focada nas necessidades reais dos concurseiros.</p>
+            <p>Nossa missão é transformar seu sonho em realidade, oferecendo um caminho claro e eficiente rumo à aprovação. Junte-se a nós e faça parte dessa jornada!</p>
         </section>
 
         <section class="content-section" id="politica-privacidade">
             <h2>Políticas de Privacidade</h2>
-            <p>Coletamos nome e email via login com Google. Os dados são usados apenas para autenticação e acompanhamento do desempenho, armazenados com segurança no Firebase.</p>
+            <p>Na RenitenteConcursos, valorizamos sua privacidade e estamos comprometidos em proteger suas informações. Esta política explica como tratamos os dados coletados em nossa plataforma:</p>
+            <ul>
+                <li><strong>Coleta de Dados:</strong> Armazenamos apenas os códigos de acesso e dados de desempenho (questões respondidas e acertos), sem coletar informações pessoais como nome, email ou CPF, a menos que você nos forneça voluntariamente.</li>
+                <li><strong>Uso dos Dados:</strong> Os dados são usados exclusivamente para validar seu acesso e acompanhar seu desempenho na plataforma.</li>
+                <li><strong>Compartilhamento:</strong> Não compartilhamos seus dados com terceiros, exceto se exigido por lei.</li>
+                <li><strong>Segurança:</strong> Utilizamos o Firebase Realtime Database com autenticação anônima para armazenar dados na nuvem de forma segura.</li>
+                <li><strong>Cookies:</strong> Não utilizamos cookies ou tecnologias de rastreamento.</li>
+                <li><strong>Alterações:</strong> Esta política pode ser atualizada, e as mudanças serão comunicadas na plataforma.</li>
+            </ul>
+            <p>Para dúvidas, entre em contato pelo email: <a href="mailto:contato@renitenteconcursos.com" style="color: #00D4FF;">contato@renitenteconcursos.com</a>.</p>
         </section>
 
         <section class="content-section" id="termos-uso">
             <h2>Termos de Uso</h2>
-            <p>Ao usar a RenitenteConcursos, você concorda que o acesso é restrito a usuários autenticados e que o conteúdo é para uso pessoal.</p>
+            <p>Ao acessar a RenitenteConcursos, você concorda com os seguintes termos:</p>
+            <ul>
+                <li><strong>Acesso:</strong> O acesso é restrito a usuários com códigos de acesso válidos, que funcionam como contas individuais.</li>
+                <li><strong>Uso do Conteúdo:</strong> Todo o conteúdo (vídeos, questões, cronogramas) é protegido por direitos autorais e destinado ao uso pessoal.</li>
+                <li><strong>Responsabilidade:</strong> A RenitenteConcursos não se responsabiliza por informações incorretas no edital; consulte o documento oficial da CEV/UECE.</li>
+                <li><strong>Conduta:</strong> É proibido tentar burlar o sistema ou compartilhar códigos de acesso.</li>
+                <li><strong>Alterações:</strong> Podemos modificar os termos, com aviso na plataforma.</li>
+                <li><strong>Encerramento:</strong> O acesso pode ser suspenso em caso de violação destes termos.</li>
+            </ul>
+            <p>Para mais informações, entre em contato: <a href="mailto:contato@renitenteconcursos.com" style="color: #00D4FF;">contato@renitenteconcursos.com</a>.</p>
         </section>
 
         <section class="content-section" id="cronograma-section">
             <h2>Cronogramas</h2>
             <div class="cronograma-container">
                 <h3>Cronograma Mensal - Preparação PM CE 2025</h3>
+                <p>Segue abaixo o cronograma sugerido para os meses de preparação até a prova:</p>
                 <table class="cronograma-table">
                     <thead>
                         <tr>
@@ -530,8 +612,78 @@
                             <td>Estudo Teórico + 20 Questões</td>
                             <td>Matemática/Raciocínio Lógico</td>
                         </tr>
+                        <tr>
+                            <td>3ª (15-21 Abr)</td>
+                            <td>Revisão + 30 Questões</td>
+                            <td>Atualidades + Informática</td>
+                        </tr>
+                        <tr>
+                            <td>4ª (22-28 Abr)</td>
+                            <td>Simulado (50 questões)</td>
+                            <td>Conhecimentos Básicos</td>
+                        </tr>
+                        <tr>
+                            <td>1ª (1-7 Mai)</td>
+                            <td>Estudo Teórico + 30 Questões</td>
+                            <td>Direito Constitucional</td>
+                        </tr>
+                        <tr>
+                            <td>2ª (8-14 Mai)</td>
+                            <td>Estudo Teórico + 30 Questões</td>
+                            <td>Direito Penal</td>
+                        </tr>
+                        <tr>
+                            <td>3ª (15-21 Mai)</td>
+                            <td>Revisão + 40 Questões</td>
+                            <td>Direito Processual Penal</td>
+                        </tr>
+                        <tr>
+                            <td>4ª (22-28 Mai)</td>
+                            <td>Simulado (100 questões)</td>
+                            <td>Todas as Disciplinas</td>
+                        </tr>
                     </tbody>
                 </table>
+                <h3>Calendário de Estudos - Abril 2025 (PMCE)</h3>
+                <div class="calendar">
+                    <div class="calendar-header">Dom</div>
+                    <div class="calendar-header">Seg</div>
+                    <div class="calendar-header">Ter</div>
+                    <div class="calendar-header">Qua</div>
+                    <div class="calendar-header">Qui</div>
+                    <div class="calendar-header">Sex</div>
+                    <div class="calendar-header">Sáb</div>
+                    <div class="calendar-day"><span>1</span><p>Português (20 questões)</p></div>
+                    <div class="calendar-day"><span>2</span><p>Matemática (20 questões)</p></div>
+                    <div class="calendar-day"><span>3</span><p>Atualidades (15 questões)</p></div>
+                    <div class="calendar-day"><span>4</span><p>Informática (15 questões)</p></div>
+                    <div class="calendar-day"><span>5</span><p>Segurança Pública (15 questões)</p></div>
+                    <div class="calendar-day"><span>6</span><p>Revisão Geral</p></div>
+                    <div class="calendar-day"><span>7</span><p>Simulado (50 questões)</p></div>
+                    <div class="calendar-day"><span>8</span><p>Dir. Constitucional (20 questões)</p></div>
+                    <div class="calendar-day"><span>9</span><p>Dir. Penal (20 questões)</p></div>
+                    <div class="calendar-day"><span>10</span><p>Dir. Processual Penal (15 questões)</p></div>
+                    <div class="calendar-day"><span>11</span><p>Legislação Extravagante (15 questões)</p></div>
+                    <div class="calendar-day"><span>12</span><p>Direitos Humanos (15 questões)</p></div>
+                    <div class="calendar-day"><span>13</span><p>Revisão Geral</p></div>
+                    <div class="calendar-day"><span>14</span><p>Simulado (50 questões)</p></div>
+                    <div class="calendar-day"><span>15</span><p>Português (20 questões)</p></div>
+                    <div class="calendar-day"><span>16</span><p>Matemática (20 questões)</p></div>
+                    <div class="calendar-day"><span>17</span><p>Atualidades (15 questões)</p></div>
+                    <div class="calendar-day"><span>18</span><p>Informática (15 questões)</p></div>
+                    <div class="calendar-day"><span>19</span><p>Segurança Pública (15 questões)</p></div>
+                    <div class="calendar-day"><span>20</span><p>Revisão Geral</p></div>
+                    <div class="calendar-day"><span>21</span><p>Simulado (50 questões)</p></div>
+                    <div class="calendar-day"><span>22</span><p>Dir. Constitucional (20 questões)</p></div>
+                    <div class="calendar-day"><span>23</span><p>Dir. Penal (20 questões)</p></div>
+                    <div class="calendar-day"><span>24</span><p>Dir. Processual Penal (15 questões)</p></div>
+                    <div class="calendar-day"><span>25</span><p>Legislação Extravagante (15 questões)</p></div>
+                    <div class="calendar-day"><span>26</span><p>Direitos Humanos (15 questões)</p></div>
+                    <div class="calendar-day"><span>27</span><p>Revisão Geral</p></div>
+                    <div class="calendar-day"><span>28</span><p>Simulado (100 questões)</p></div>
+                    <div class="calendar-day"><span>29</span><p>Português (20 questões)</p></div>
+                    <div class="calendar-day"><span>30</span><p>Matemática (20 questões)</p></div>
+                </div>
             </div>
         </section>
 
@@ -549,10 +701,10 @@
                     </select>
                     <select id="status-filter" onchange="filterQuestions()">
                         <option value="ALL" selected>Todas</option>
-                        <option value="RESOLVED">Resolvidas</option>
-                        <option value="CORRECT">Corretas</option>
-                        <option value="INCORRECT">Erradas</option>
-                        <option value="UNRESOLVED">Não Resolvidas</option>
+                        <option value="RESOLVED">Questões Resolvidas</option>
+                        <option value="CORRECT">Questões Corretas</option>
+                        <option value="INCORRECT">Questões Erradas</option>
+                        <option value="UNRESOLVED">Questões Não Resolvidas</option>
                     </select>
                 </div>
                 <div id="questions-list"></div>
@@ -582,68 +734,60 @@
     </footer>
 
     <script>
-        // Configuração do Firebase
+        // Configuração do Firebase (usando a configuração fornecida)
         const firebaseConfig = {
-            apiKey: "AIzaSyA0HlFQz76WCPjLJ3xKG_tV9VyJWIxykwA",
-            authDomain: "renitenteconcursos-dfae4.firebaseapp.com",
-            projectId: "renitenteconcursos-dfae4",
-            storageBucket: "renitenteconcursos-dfae4.firebasestorage.app",
-            messagingSenderId: "730183164564",
-            appId: "1:730183164564:web:a6f57211f02e1154f3ca81",
-            measurementId: "G-JZJR8PD0NJ"
+            apiKey: "AIzaSyAWhd3K9knYzHNr0Q1Prz7MZ4GC6yzOXUA",
+            authDomain: "renitenteconcursos-82fb9.firebaseapp.com",
+            databaseURL: "https://renitenteconcursos-82fb9-default-rtdb.firebaseio.com",
+            projectId: "renitenteconcursos-82fb9",
+            storageBucket: "renitenteconcursos-82fb9.firebasestorage.app",
+            messagingSenderId: "687761393677",
+            appId: "1:687761393677:web:81db67554307f922f2ad44"
         };
 
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const googleProvider = new firebase.auth.GoogleAuthProvider();
+        const db = firebase.database();
 
-        let currentUser = null;
+        const validCodes = [
+            "1234", "5678", "9012", "3456", "7890", "2345", "6789", "0123", "4567", "8901",
+            "1357", "2468", "3579", "4680", "5791", "6802", "7913", "8024", "9135", "0246",
+            "1358", "2469", "3570", "4681", "5792", "6803", "7914", "8025", "9136", "0247"
+        ];
+
+        let currentUserCode = null;
         let chart = null;
-
-        // Lista de questões (mantida localmente)
         const massificacaoQuestions = [
             { id: 1, question: "Qual é a capital do Brasil?", options: ["São Paulo", "Rio de Janeiro", "Brasília", "Salvador"], correct: "Brasília" },
             { id: 2, question: "2 + 2 é igual a:", options: ["3", "4", "5", "6"], correct: "4" },
-            { id: 3, question: "Qual é o maior planeta do Sistema Solar?", options: ["Terra", "Marte", "Júpiter", "Saturno"], correct: "Júpiter" }
+            { id: 3, question: "Qual é o maior planeta do Sistema Solar?", options: ["Terra", "Marte", "Júpiter", "Saturno"], correct: "Júpiter" },
+            { id: 4, question: "Quem escreveu 'Dom Casmurro'?", options: ["Machado de Assis", "José de Alencar", "Clarice Lispector", " Guimarães Rosa"], correct: "Machado de Assis" },
+            { id: 5, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+            { id: 6, question: "Qual é o maior oceano do mundo?", options: ["Atlântico", "Índico", "Ártico", "Pacífico"], correct: "Pacífico" },
+            { id: 7, question: "Quantos continentes habitados existem?", options: ["4", "5", "6", "7"], correct: "6" },
+            { id: 8, question: "Qual é a fórmula da água?", options: ["H2O", "CO2", "NaCl", "O2"], correct: "H2O" },
+            { id: 9, question: "Quem pintou a Mona Lisa?", options: ["Van Gogh", "Picasso", "Leonardo da Vinci", "Michelangelo"], correct: "Leonardo da Vinci" },
+            { id: 10, question: "Qual é o idioma oficial do Brasil?", options: ["Espanhol", "Inglês", "Português", "Francês"], correct: "Português" },
+            { id: 11, question: "Qual é 10% de 200?", options: ["10", "20", "30", "40"], correct: "20" },
+            { id: 12, question: "Qual é o símbolo do ferro?", options: ["Fe", "Fr", "Fo", "Fi"], correct: "Fe" },
+            { id: 13, question: "Quem descobriu o Brasil?", options: ["Cristóvão Colombo", "Pedro Álvares Cabral", "Vasco da Gama", "Fernão de Magalhães"], correct: "Pedro Álvares Cabral" },
+            { id: 14, question: "Qual é o menor país do mundo?", options: ["Mônaco", "Vaticano", "San Marino", "Liechtenstein"], correct: "Vaticano" },
+            { id: 15, question: "Quantos lados tem um triângulo?", options: ["2", "3", "4", "5"], correct: "3" },
+            { id: 16, question: "Qual é a raiz quadrada de 16?", options: ["2", "4", "6", "8"], correct: "4" },
+            { id: 16, question: "Qual é a raiz quadrada de 16?", options: ["2", "4", "6", "8"], correct: "4" },
+            { id: 17, question: "Qual planeta é conhecido como o planeta vermelho?", options: ["Vênus", "Marte", "Júpiter", "Mercúrio"], correct: "Marte" },
+            { id: 18, question: "Qual é o plural de 'cão'?", options: ["Cães", "Cãos", "Cãis", "Cans"], correct: "Cães" },
+            { id: 19, question: "Qual é o oposto de 'alto'?", options: ["Grande", "Baixo", "Longo", "Curto"], correct: "Baixo" },
+            { id: 20, question: "Qual é 5 x 6?", options: ["25", "30", "35", "40"], correct: "30" },
         ];
 
-        // Verifica estado de autenticação
-        auth.onAuthStateChanged(async user => {
-            if (user) {
-                currentUser = user;
-                const userDocRef = db.collection('users').doc(user.uid);
-                const userDoc = await userDocRef.get();
-                if (!userDoc.exists) {
-                    await userDocRef.set({
-                        name: user.displayName,
-                        email: user.email,
-                        answered: {},
-                        correct: 0,
-                        total: 0
-                    });
-                }
-                document.getElementById('hero').style.display = 'none';
-                document.getElementById('navbar').style.display = 'flex';
-                document.getElementById('dashboard-section').style.display = 'block';
-                hideContentSections();
-                checkVideo();
-            } else {
-                currentUser = null;
-                goHome();
-            }
-        });
-
-        function signInWithGoogle() {
-            auth.signInWithPopup(googleProvider)
-                .catch(error => alert(`Erro ao entrar: ${error.message}`));
-        }
-
-        function signOut() {
-            auth.signOut()
-                .then(() => goHome())
-                .catch(error => alert(`Erro ao sair: ${error.message}`));
+        for (let i = 21; i <= 100; i++) {
+            massificacaoQuestions.push({
+                id: i,
+                question: `Questão de exemplo ${i}: Qual é ${i % 10} + ${i % 10}?`,
+                options: [`${i % 10 + i % 10 - 1}`, `${i % 10 + i % 10}`, `${i % 10 + i % 10 + 1}`, `${i % 10 + i % 10 + 2}`],
+                correct: `${i % 10 + i % 10}`
+            });
         }
 
         function goHome() {
@@ -652,23 +796,48 @@
                 window.scrollTo(0, 0);
             } else {
                 document.getElementById('hero').style.display = 'flex';
-                document.getElementById('navbar').style.display = 'none';
                 document.getElementById('dashboard-section').style.display = 'none';
                 hideContentSections();
+                document.getElementById('access-code').value = '';
             }
             toggleMenu(false);
         }
 
+        function verifyAccess() {
+            const inputCode = document.getElementById('access-code').value.trim();
+            if (inputCode && validCodes.includes(inputCode)) {
+                currentUserCode = inputCode;
+                document.getElementById('hero').style.display = 'none';
+                document.getElementById('navbar').style.display = 'flex';
+                document.getElementById('dashboard-section').style.display = 'block';
+                hideContentSections();
+                checkVideo();
+                loadUserData(() => filterQuestions());
+            } else {
+                alert('Código de acesso inválido! Tente novamente ou solicite uma chave.');
+            }
+            toggleMenu(false);
+        }
+
+        function requestAccessKey() {
+            window.open(`https://api.whatsapp.com/send?phone=5583993110329&text=QUERO%20A%20CHAVE%20DE%20ACESSO`, '_blank');
+        }
+
         function toggleMenu(forceClose = false) {
             const menu = document.querySelector('.menu');
-            if (forceClose) menu.classList.remove('active');
-            else menu.classList.toggle('active');
+            if (forceClose) {
+                menu.classList.remove('active');
+            } else {
+                menu.classList.toggle('active');
+            }
         }
 
         function showSection(sectionId) {
-            if (!currentUser) {
-                alert('Faça login com Google primeiro!');
-                goHome();
+            if (!currentUserCode) {
+                alert('Acesse com sua chave primeiro!');
+                document.getElementById('hero').style.display = 'flex';
+                document.getElementById('dashboard-section').style.display = 'none';
+                hideContentSections();
                 return;
             }
             hideContentSections();
@@ -689,19 +858,29 @@
 
         function checkVideo() {
             const video = document.querySelector('video');
-            video.addEventListener('error', () => console.error('Erro ao carregar o vídeo.'));
+            video.addEventListener('error', () => console.error('Erro ao carregar o vídeo. Verifique o caminho ou formato.'));
             video.addEventListener('loadeddata', () => console.log('Vídeo carregado com sucesso!'));
         }
 
-        async function loadUserData() {
-            if (!currentUser) return { answered: {}, correct: 0, total: 0 };
-            const doc = await db.collection('users').doc(currentUser.uid).get();
-            return doc.exists ? doc.data() : { answered: {}, correct: 0, total: 0 };
+        function loadUserData(callback) {
+            if (!currentUserCode) return;
+            const userRef = db.ref(`users/user_${currentUserCode}`);
+            userRef.once('value', (snapshot) => {
+                const userData = snapshot.val() || { answered: {}, correct: 0, total: 0 };
+                if (callback) callback(userData);
+            }, (error) => {
+                console.error('Erro ao carregar dados:', error);
+                alert('Erro ao conectar com o banco de dados. Tente novamente mais tarde.');
+            });
         }
 
-        async function saveUserData(userData) {
-            if (!currentUser) return;
-            await db.collection('users').doc(currentUser.uid).set(userData);
+        function saveUserData(userData) {
+            if (!currentUserCode) return;
+            const userRef = db.ref(`users/user_${currentUserCode}`);
+            userRef.set(userData).catch(error => {
+                console.error('Erro ao salvar dados:', error);
+                alert('Erro ao salvar dados. Tente novamente.');
+            });
         }
 
         function filterQuestions() {
@@ -709,18 +888,19 @@
             const status = document.getElementById('status-filter').value;
             const questionsList = document.getElementById('questions-list');
             questionsList.innerHTML = '';
-            const userData = loadUserData().then(data => {
+
+            loadUserData((userData) => {
                 if (banca === 'MASSIFICACAO') {
                     let filteredQuestions = massificacaoQuestions;
 
                     if (status === 'RESOLVED') {
-                        filteredQuestions = massificacaoQuestions.filter(q => data.answered[q.id]);
+                        filteredQuestions = massificacaoQuestions.filter(q => userData.answered[q.id]);
                     } else if (status === 'CORRECT') {
-                        filteredQuestions = massificacaoQuestions.filter(q => data.answered[q.id] && data.answered[q.id] === q.correct);
+                        filteredQuestions = massificacaoQuestions.filter(q => userData.answered[q.id] && userData.answered[q.id] === q.correct);
                     } else if (status === 'INCORRECT') {
-                        filteredQuestions = massificacaoQuestions.filter(q => data.answered[q.id] && data.answered[q.id] !== q.correct);
+                        filteredQuestions = massificacaoQuestions.filter(q => userData.answered[q.id] && userData.answered[q.id] !== q.correct);
                     } else if (status === 'UNRESOLVED') {
-                        filteredQuestions = massificacaoQuestions.filter(q => !data.answered[q.id]);
+                        filteredQuestions = massificacaoQuestions.filter(q => !userData.answered[q.id]);
                     }
 
                     filteredQuestions.forEach(q => {
@@ -735,47 +915,50 @@
                             <div id="feedback-${q.id}" class="feedback"></div>
                         `;
                         questionsList.appendChild(div);
-                        if (data.answered[q.id]) {
-                            checkAnswer(q.id, data.answered[q.id], q.correct, true);
+                        if (userData.answered[q.id]) {
+                            checkAnswer(q.id, userData.answered[q.id], q.correct, true);
                         }
                     });
                 } else {
-                    questionsList.innerHTML = `<p>Questões para a banca ${banca} ainda não estão disponíveis. Tente "Massificação"!</p>`;
+                    questionsList.innerHTML = `<p>Questões para a banca ${banca} ainda não estão disponíveis. Tente "Massificação" para praticar!</p>`;
                 }
             });
         }
 
-        async function submitAnswer(questionId, correct) {
+        function submitAnswer(questionId, correct) {
             const selectedOption = document.querySelector(`input[name="q${questionId}"]:checked`);
             const feedbackDiv = document.getElementById(`feedback-${questionId}`);
-            const userData = await loadUserData();
 
             if (!selectedOption) {
-                feedbackDiv.innerHTML = 'Selecione uma opção antes de responder!';
+                feedbackDiv.innerHTML = 'Por favor, selecione uma opção antes de responder!';
                 feedbackDiv.className = 'feedback incorrect';
                 return;
             }
 
             const selected = selectedOption.value;
 
-            if (userData.answered[questionId]) {
-                if (userData.answered[questionId] === correct && selected !== correct) {
-                    userData.correct--;
-                } else if (userData.answered[questionId] !== correct && selected === correct) {
-                    userData.correct++;
+            loadUserData((userData) => {
+                if (userData.answered[questionId]) {
+                    if (userData.answered[questionId] === correct && selected !== correct) {
+                        userData.correct--;
+                    } else if (userData.answered[questionId] !== correct && selected === correct) {
+                        userData.correct++;
+                    }
+                } else {
+                    userData.total++;
+                    if (selected === correct) userData.correct++;
                 }
-            } else {
-                userData.total++;
-                if (selected === correct) userData.correct++;
-            }
 
-            userData.answered[questionId] = selected;
-            await saveUserData(userData);
-            checkAnswer(questionId, selected, correct);
+                userData.answered[questionId] = selected;
+                saveUserData(userData);
+                checkAnswer(questionId, selected, correct);
+                updateDesempenho();
+            });
         }
 
         function checkAnswer(questionId, selected, correct, fromLoad = false) {
             const feedbackDiv = document.getElementById(`feedback-${questionId}`);
+
             if (selected === correct) {
                 feedbackDiv.innerHTML = 'RESPOSTA CORRETA';
                 feedbackDiv.className = 'feedback correct';
@@ -785,33 +968,35 @@
             }
         }
 
-        async function updateDesempenho() {
-            const userData = await loadUserData();
-            document.getElementById('total-answered').textContent = userData.total;
-            document.getElementById('total-correct').textContent = userData.correct;
-            const accuracy = userData.total > 0 ? (userData.correct / userData.total) * 100 : 0;
-            document.getElementById('accuracy').textContent = accuracy.toFixed(2) + '%';
+        function updateDesempenho() {
+            loadUserData((userData) => {
+                document.getElementById('total-answered').textContent = userData.total;
+                document.getElementById('total-correct').textContent = userData.correct;
+                const accuracy = userData.total > 0 ? (userData.correct / userData.total) * 100 : 0;
+                document.getElementById('accuracy').textContent = accuracy.toFixed(2) + '%';
 
-            const ctx = document.getElementById('performance-chart').getContext('2d');
-            if (chart) chart.destroy();
-            chart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Corretas', 'Erradas'],
-                    datasets: [{
-                        data: [userData.correct, userData.total - userData.correct],
-                        backgroundColor: ['#00FF00', '#FF0000'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'top', labels: { color: '#E0E0E0' } },
-                        title: { display: true, text: 'Desempenho em Questões', color: '#E0E0E0' }
+                const ctx = document.getElementById('performance-chart').getContext('2d');
+
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Corretas', 'Erradas'],
+                        datasets: [{
+                            data: [userData.correct, userData.total - userData.correct],
+                            backgroundColor: ['#00FF00', '#FF0000'],
+                            borderWidth: 0
+                        }]
                     },
-                    cutout: '70%'
-                }
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'top', labels: { color: '#E0E0E0' } },
+                            title: { display: true, text: 'Desempenho em Questões', color: '#E0E0E0' }
+                        },
+                        cutout: '70%'
+                    }
+                });
             });
         }
     </script>
