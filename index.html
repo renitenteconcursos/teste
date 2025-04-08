@@ -165,6 +165,12 @@
             border-radius: 10px;
         }
 
+        .video-fallback {
+            color: #E0E0E0;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
         .summary-container {
             max-width: 800px;
             margin: 0 auto;
@@ -274,7 +280,7 @@
         <header>
             <nav class="navbar">
                 <div class="logo-container" onclick="goHome()">
-                    <img src="logo.png" alt="Logo" class="logo">
+                    <img src="https://via.placeholder.com/40" alt="Logo" class="logo">
                     <h1>RenitenteConcursos</h1>
                 </div>
                 <button class="menu-btn" onclick="toggleMenu()">MENU</button>
@@ -304,6 +310,7 @@
                     <source src="inicio.mp4" type="video/mp4">
                     Seu navegador não suporta o elemento de vídeo.
                 </video>
+                <p class="video-fallback">Se o vídeo não carregar, verifique se o arquivo <code>inicio.mp4</code> está no mesmo diretório que este HTML ou ajuste o caminho no código.</p>
             </div>
             <div class="summary-container">
                 <h3>Resumão Detalhado do Edital PM CE 2025</h3>
@@ -489,6 +496,7 @@
                 document.getElementById('hero').style.display = 'none';
                 document.getElementById('dashboard-section').style.display = 'block';
                 hideContentSections();
+                checkVideo();
             } else {
                 alert('Código de acesso inválido! Tente novamente.');
             }
@@ -516,6 +524,16 @@
         function hideContentSections() {
             document.querySelectorAll('.content-section').forEach(section => {
                 section.style.display = 'none';
+            });
+        }
+
+        function checkVideo() {
+            const video = document.querySelector('video');
+            video.addEventListener('error', () => {
+                console.error('Erro ao carregar o vídeo. Verifique o caminho ou formato do arquivo.');
+            });
+            video.addEventListener('loadeddata', () => {
+                console.log('Vídeo carregado com sucesso!');
             });
         }
     </script>
