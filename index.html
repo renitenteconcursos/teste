@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RenitenteConcursos - Prepare-se para o PMCE</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
     <style>
         * {
             margin: 0;
@@ -114,17 +118,9 @@
         .access-container {
             max-width: 400px;
             margin: 20px auto;
-        }
-
-        .access-container input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: none;
-            border-radius: 5px;
-            background-color: #E0E0E0;
-            color: #1C2526;
-            font-size: 16px;
+            padding: 20px;
+            background-color: rgba(42, 47, 49, 0.9);
+            border-radius: 10px;
         }
 
         .btn {
@@ -137,11 +133,21 @@
             font-size: clamp(14px, 3vw, 16px);
             cursor: pointer;
             transition: background-color 0.3s, transform 0.2s;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .btn:hover {
             background-color: #E0E0E0;
             transform: scale(1.05);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
         }
 
         .dashboard-section, .content-section {
@@ -179,6 +185,10 @@
             padding: 20px;
             border-radius: 10px;
             text-align: left;
+        }
+
+        .cronograma-container {
+            max-width: 1000px;
         }
 
         .summary-container h3, .cronograma-container h3, .questoes-container h3, .desempenho-container h3 {
@@ -226,6 +236,39 @@
             background-color: #40484A;
         }
 
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 20px;
+        }
+
+        .calendar-day {
+            background-color: #2A2F31;
+            padding: 10px;
+            border-radius: 5px;
+            min-height: 100px;
+            position: relative;
+        }
+
+        .calendar-day span {
+            font-weight: bold;
+            color: #00D4FF;
+        }
+
+        .calendar-day p {
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .calendar-header {
+            background-color: #00D4FF;
+            color: #1C2526;
+            font-weight: bold;
+            padding: 10px;
+            text-align: center;
+        }
+
         .filter-container {
             margin-bottom: 20px;
         }
@@ -236,10 +279,15 @@
             background-color: #E0E0E0;
             color: #1C2526;
             font-size: 16px;
+            margin-right: 10px;
         }
 
         .question {
             margin-bottom: 20px;
+            background-color: #2A2F31;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #40484A;
         }
 
         .question p {
@@ -255,6 +303,22 @@
 
         .question input[type="radio"] {
             margin-right: 10px;
+        }
+
+        .question .submit-btn {
+            background-color: #00D4FF;
+            color: #1C2526;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .question .submit-btn:hover {
+            background-color: #E0E0E0;
         }
 
         .feedback {
@@ -273,6 +337,11 @@
         .desempenho-container p span {
             color: #00D4FF;
             font-weight: bold;
+        }
+
+        #performance-chart {
+            max-width: 600px;
+            margin: 20px auto;
         }
 
         footer {
@@ -325,13 +394,16 @@
             .menu-btn {
                 display: block;
             }
+            .calendar {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
 <body>
     <main>
         <header>
-            <nav class="navbar">
+            <nav class="navbar" id="navbar" style="display: none;">
                 <div class="logo-container" onclick="goHome()">
                     <img src="logo.png" alt="Logo" class="logo">
                     <h1>RenitenteConcursos</h1>
@@ -343,6 +415,7 @@
                     <li><a href="#">Simulados</a></li>
                     <li><a onclick="showSection('cronograma-section')">Cronogramas</a></li>
                     <li><a onclick="showSection('desempenho-section')">Desempenho</a></li>
+                    <li><a onclick="signOut()">Sair</a></li>
                 </ul>
             </nav>
         </header>
@@ -352,8 +425,10 @@
                 <h2>Conquiste sua vaga na PMCE com a RenitenteConcursos</h2>
                 <p>Milhares de questões, simulados e cursos focados no concurso da Polícia Militar do Ceará.</p>
                 <div class="access-container">
-                    <input type="text" id="access-code" placeholder="Digite seu Código de Acesso">
-                    <button class="btn" onclick="verifyAccess()">Entrar</button>
+                    <button class="btn" onclick="signInWithGoogle()">
+                        <img src="https://www.google.com/favicon.ico" alt="Google" class="google-icon">
+                        Entrar com Google
+                    </button>
                 </div>
             </div>
         </section>
@@ -489,11 +564,10 @@
             <h2>Políticas de Privacidade</h2>
             <p>Na RenitenteConcursos, valorizamos sua privacidade e estamos comprometidos em proteger suas informações. Esta política explica como tratamos os dados coletados em nossa plataforma:</p>
             <ul>
-                <li><strong>Coleta de Dados:</strong> Armazenamos apenas os códigos de acesso e dados de desempenho (questões respondidas e acertos), sem coletar informações pessoais como nome, email ou CPF, a menos que você nos forneça voluntariamente.</li>
-                <li><strong>Uso dos Dados:</strong> Os dados são usados exclusivamente para validar seu acesso e acompanhar seu desempenho na plataforma.</li>
+                <li><strong>Coleta de Dados:</strong> Coletamos nome e email via login com Google, além de dados de desempenho (questões respondidas e acertos).</li>
+                <li><strong>Uso dos Dados:</strong> Os dados são usados para autenticação e acompanhamento do seu desempenho na plataforma.</li>
                 <li><strong>Compartilhamento:</strong> Não compartilhamos seus dados com terceiros, exceto se exigido por lei.</li>
-                <li><strong>Segurança:</strong> Utilizamos <code>localStorage</code> para armazenar dados localmente no seu dispositivo.</li>
-                <li><strong>Cookies:</strong> Não utilizamos cookies ou tecnologias de rastreamento.</li>
+                <li><strong>Segurança:</strong> Utilizamos Firebase para armazenar dados com segurança na nuvem.</li>
                 <li><strong>Alterações:</strong> Esta política pode ser atualizada, e as mudanças serão comunicadas na plataforma.</li>
             </ul>
             <p>Para dúvidas, entre em contato pelo email: <a href="mailto:contato@renitenteconcursos.com" style="color: #00D4FF;">contato@renitenteconcursos.com</a>.</p>
@@ -503,10 +577,10 @@
             <h2>Termos de Uso</h2>
             <p>Ao acessar a RenitenteConcursos, você concorda com os seguintes termos:</p>
             <ul>
-                <li><strong>Acesso:</strong> O acesso é restrito a usuários com códigos de acesso válidos, que funcionam como contas individuais.</li>
-                <li><strong>Uso do Conteúdo:</strong> Todo o conteúdo (vídeos, questões, cronogramas) é protegido por direitos autorais e destinado ao uso pessoal.</li>
+                <li><strong>Acesso:</strong> O acesso é restrito a usuários autenticados via Google.</li>
+                <li><strong>Uso do Conteúdo:</strong> Todo o conteúdo é protegido por direitos autorais e destinado ao uso pessoal.</li>
                 <li><strong>Responsabilidade:</strong> A RenitenteConcursos não se responsabiliza por informações incorretas no edital; consulte o documento oficial da CEV/UECE.</li>
-                <li><strong>Conduta:</strong> É proibido tentar burlar o sistema ou compartilhar códigos de acesso.</li>
+                <li><strong>Conduta:</strong> É proibido tentar burlar o sistema ou compartilhar credenciais.</li>
                 <li><strong>Alterações:</strong> Podemos modificar os termos, com aviso na plataforma.</li>
                 <li><strong>Encerramento:</strong> O acesso pode ser suspenso em caso de violação destes termos.</li>
             </ul>
@@ -569,13 +643,53 @@
                         </tr>
                     </tbody>
                 </table>
+                <h3>Calendário de Estudos - Abril 2025 (PMCE)</h3>
+                <div class="calendar">
+                    <div class="calendar-header">Dom</div>
+                    <div class="calendar-header">Seg</div>
+                    <div class="calendar-header">Ter</div>
+                    <div class="calendar-header">Qua</div>
+                    <div class="calendar-header">Qui</div>
+                    <div class="calendar-header">Sex</div>
+                    <div class="calendar-header">Sáb</div>
+                    <div class="calendar-day"><span>1</span><p>Português (20 questões)</p></div>
+                    <div class="calendar-day"><span>2</span><p>Matemática (20 questões)</p></div>
+                    <div class="calendar-day"><span>3</span><p>Atualidades (15 questões)</p></div>
+                    <div class="calendar-day"><span>4</span><p>Informática (15 questões)</p></div>
+                    <div class="calendar-day"><span>5</span><p>Segurança Pública (15 questões)</p></div>
+                    <div class="calendar-day"><span>6</span><p>Revisão Geral</p></div>
+                    <div class="calendar-day"><span>7</span><p>Simulado (50 questões)</p></div>
+                    <div class="calendar-day"><span>8</span><p>Dir. Constitucional (20 questões)</p></div>
+                    <div class="calendar-day"><span>9</span><p>Dir. Penal (20 questões)</p></div>
+                    <div class="calendar-day"><span>10</span><p>Dir. Processual Penal (15 questões)</p></div>
+                    <div class="calendar-day"><span>11</span><p>Legislação Extravagante (15 questões)</p></div>
+                    <div class="calendar-day"><span>12</span><p>Direitos Humanos (15 questões)</p></div>
+                    <div class="calendar-day"><span>13</span><p>Revisão Geral</p></div>
+                    <div class="calendar-day"><span>14</span><p>Simulado (50 questões)</p></div>
+                    <div class="calendar-day"><span>15</span><p>Português (20 questões)</p></div>
+                    <div class="calendar-day"><span>16</span><p>Matemática (20 questões)</p></div>
+                    <div class="calendar-day"><span>17</span><p>Atualidades (15 questões)</p></div>
+                    <div class="calendar-day"><span>18</span><p>Informática (15 questões)</p></div>
+                    <div class="calendar-day"><span>19</span><p>Segurança Pública (15 questões)</p></div>
+                    <div class="calendar-day"><span>20</span><p>Revisão Geral</p></div>
+                    <div class="calendar-day"><span>21</span><p>Simulado (50 questões)</p></div>
+                    <div class="calendar-day"><span>22</span><p>Dir. Constitucional (20 questões)</p></div>
+                    <div class="calendar-day"><span>23</span><p>Dir. Penal (20 questões)</p></div>
+                    <div class="calendar-day"><span>24</span><p>Dir. Processual Penal (15 questões)</p></div>
+                    <div class="calendar-day"><span>25</span><p>Legislação Extravagante (15 questões)</p></div>
+                    <div class="calendar-day"><span>26</span><p>Direitos Humanos (15 questões)</p></div>
+                    <div class="calendar-day"><span>27</span><p>Revisão Geral</p></div>
+                    <div class="calendar-day"><span>28</span><p>Simulado (100 questões)</p></div>
+                    <div class="calendar-day"><span>29</span><p>Português (20 questões)</p></div>
+                    <div class="calendar-day"><span>30</span><p>Matemática (20 questões)</p></div>
+                </div>
             </div>
         </section>
 
         <section class="content-section" id="questoes-section">
             <h2>Questões</h2>
             <div class="questoes-container">
-                <h3>Filtre por Banca</h3>
+                <h3>Filtre por Banca e Status</h3>
                 <div class="filter-container">
                     <select id="banca-filter" onchange="filterQuestions()">
                         <option value="FUNECE">FUNECE</option>
@@ -583,6 +697,13 @@
                         <option value="IDECAN">IDECAN</option>
                         <option value="INSTITUTO AOCP">INSTITUTO AOCP</option>
                         <option value="MASSIFICACAO" selected>MASSIFICAÇÃO</option>
+                    </select>
+                    <select id="status-filter" onchange="filterQuestions()">
+                        <option value="ALL" selected>Todas</option>
+                        <option value="RESOLVED">Questões Resolvidas</option>
+                        <option value="CORRECT">Questões Corretas</option>
+                        <option value="INCORRECT">Questões Erradas</option>
+                        <option value="UNRESOLVED">Questões Não Resolvidas</option>
                     </select>
                 </div>
                 <div id="questions-list"></div>
@@ -595,6 +716,7 @@
                 <p>Questões Respondidas: <span id="total-answered">0</span></p>
                 <p>Questões Acertadas: <span id="total-correct">0</span></p>
                 <p>Porcentagem de Acertos: <span id="accuracy">0%</span></p>
+                <canvas id="performance-chart"></canvas>
             </div>
         </section>
     </main>
@@ -611,13 +733,24 @@
     </footer>
 
     <script>
-        const validCodes = [
-            "1234", "5678", "9012", "3456", "7890", "2345", "6789", "0123", "4567", "8901",
-            "1357", "2468", "3579", "4680", "5791", "6802", "7913", "8024", "9135", "0246",
-            "1358", "2469", "3570", "4681", "5792", "6803", "7914", "8025", "9136", "0247"
-        ];
+        // Configuração do Firebase (substitua pelos seus dados do Firebase)
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
 
-        let currentUserCode = null;
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+        let currentUser = null;
+        let chart = null;
         const massificacaoQuestions = [
             { id: 1, question: "Qual é a capital do Brasil?", options: ["São Paulo", "Rio de Janeiro", "Brasília", "Salvador"], correct: "Brasília" },
             { id: 2, question: "2 + 2 é igual a:", options: ["3", "4", "5", "6"], correct: "4" },
@@ -629,22 +762,18 @@
             { id: 8, question: "Qual é a fórmula da água?", options: ["H2O", "CO2", "NaCl", "O2"], correct: "H2O" },
             { id: 9, question: "Quem pintou a Mona Lisa?", options: ["Van Gogh", "Picasso", "Leonardo da Vinci", "Michelangelo"], correct: "Leonardo da Vinci" },
             { id: 10, question: "Qual é o idioma oficial do Brasil?", options: ["Espanhol", "Inglês", "Português", "Francês"], correct: "Português" },
-            // Adicionando mais 90 questões (exemplo reduzido para evitar excesso aqui)
             { id: 11, question: "Qual é 10% de 200?", options: ["10", "20", "30", "40"], correct: "20" },
             { id: 12, question: "Qual é o símbolo do ferro?", options: ["Fe", "Fr", "Fo", "Fi"], correct: "Fe" },
             { id: 13, question: "Quem descobriu o Brasil?", options: ["Cristóvão Colombo", "Pedro Álvares Cabral", "Vasco da Gama", "Fernão de Magalhães"], correct: "Pedro Álvares Cabral" },
             { id: 14, question: "Qual é o menor país do mundo?", options: ["Mônaco", "Vaticano", "San Marino", "Liechtenstein"], correct: "Vaticano" },
             { id: 15, question: "Quantos lados tem um triângulo?", options: ["2", "3", "4", "5"], correct: "3" },
-            // Para completar 100, imaginei questões variadas de conhecimento geral, matemática e português
             { id: 16, question: "Qual é a raiz quadrada de 16?", options: ["2", "4", "6", "8"], correct: "4" },
             { id: 17, question: "Qual planeta é conhecido como o planeta vermelho?", options: ["Vênus", "Marte", "Júpiter", "Mercúrio"], correct: "Marte" },
             { id: 18, question: "Qual é o plural de 'cão'?", options: ["Cães", "Cãos", "Cãis", "Cans"], correct: "Cães" },
             { id: 19, question: "Qual é o oposto de 'alto'?", options: ["Grande", "Baixo", "Longo", "Curto"], correct: "Baixo" },
             { id: 20, question: "Qual é 5 x 6?", options: ["25", "30", "35", "40"], correct: "30" },
-            // Aqui seriam mais 80 questões, mas para brevity, listo apenas até 20 e confirmo que são 100 no total
         ];
 
-        // Preenche até 100 questões
         for (let i = 21; i <= 100; i++) {
             massificacaoQuestions.push({
                 id: i,
@@ -654,32 +783,55 @@
             });
         }
 
+        // Verifica estado de autenticação
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                currentUser = user;
+                // Inicializa ou atualiza os dados do usuário no Firestore
+                const userDocRef = db.collection('users').doc(user.uid);
+                const userDoc = await userDocRef.get();
+                if (!userDoc.exists) {
+                    await userDocRef.set({
+                        name: user.displayName,
+                        email: user.email,
+                        answered: {},
+                        correct: 0,
+                        total: 0
+                    });
+                }
+                document.getElementById('hero').style.display = 'none';
+                document.getElementById('navbar').style.display = 'flex';
+                document.getElementById('dashboard-section').style.display = 'block';
+                hideContentSections();
+                checkVideo();
+            } else {
+                currentUser = null;
+                goHome();
+            }
+        });
+
         function goHome() {
             const dashboard = document.getElementById('dashboard-section');
             if (dashboard.style.display === 'block') {
                 window.scrollTo(0, 0);
             } else {
                 document.getElementById('hero').style.display = 'flex';
+                document.getElementById('navbar').style.display = 'none';
                 document.getElementById('dashboard-section').style.display = 'none';
                 hideContentSections();
-                document.getElementById('access-code').value = '';
             }
             toggleMenu(false);
         }
 
-        function verifyAccess() {
-            const inputCode = document.getElementById('access-code').value;
-            if (validCodes.includes(inputCode)) {
-                currentUserCode = inputCode;
-                document.getElementById('hero').style.display = 'none';
-                document.getElementById('dashboard-section').style.display = 'block';
-                hideContentSections();
-                checkVideo();
-                loadUserData();
-            } else {
-                alert('Código de acesso inválido! Tente novamente.');
-            }
-            toggleMenu(false);
+        function signInWithGoogle() {
+            auth.signInWithPopup(googleProvider)
+                .catch(error => alert(`Erro ao entrar com Google: ${error.message}`));
+        }
+
+        function signOut() {
+            auth.signOut().then(() => {
+                goHome();
+            }).catch(error => alert(`Erro ao sair: ${error.message}`));
         }
 
         function toggleMenu(forceClose = false) {
@@ -692,6 +844,11 @@
         }
 
         function showSection(sectionId) {
+            if (!currentUser) {
+                alert('Faça login com Google primeiro!');
+                goHome();
+                return;
+            }
             hideContentSections();
             document.getElementById('hero').style.display = 'none';
             document.getElementById('dashboard-section').style.display = 'none';
@@ -714,34 +871,46 @@
             video.addEventListener('loadeddata', () => console.log('Vídeo carregado com sucesso!'));
         }
 
-        function loadUserData() {
-            const userData = JSON.parse(localStorage.getItem(`user_${currentUserCode}`)) || {
-                answered: {},
-                correct: 0,
-                total: 0
-            };
-            return userData;
+        async function loadUserData() {
+            if (!currentUser) return { answered: {}, correct: 0, total: 0 };
+            const doc = await db.collection('users').doc(currentUser.uid).get();
+            return doc.exists ? doc.data() : { answered: {}, correct: 0, total: 0 };
         }
 
-        function saveUserData(userData) {
-            localStorage.setItem(`user_${currentUserCode}`, JSON.stringify(userData));
+        async function saveUserData(userData) {
+            if (!currentUser) return;
+            await db.collection('users').doc(currentUser.uid).set(userData);
         }
 
-        function filterQuestions() {
+        async function filterQuestions() {
             const banca = document.getElementById('banca-filter').value;
+            const status = document.getElementById('status-filter').value;
             const questionsList = document.getElementById('questions-list');
             questionsList.innerHTML = '';
+            const userData = await loadUserData();
 
             if (banca === 'MASSIFICACAO') {
-                const userData = loadUserData();
-                massificacaoQuestions.forEach(q => {
+                let filteredQuestions = massificacaoQuestions;
+
+                if (status === 'RESOLVED') {
+                    filteredQuestions = massificacaoQuestions.filter(q => userData.answered[q.id]);
+                } else if (status === 'CORRECT') {
+                    filteredQuestions = massificacaoQuestions.filter(q => userData.answered[q.id] && userData.answered[q.id] === q.correct);
+                } else if (status === 'INCORRECT') {
+                    filteredQuestions = massificacaoQuestions.filter(q => userData.answered[q.id] && userData.answered[q.id] !== q.correct);
+                } else if (status === 'UNRESOLVED') {
+                    filteredQuestions = massificacaoQuestions.filter(q => !userData.answered[q.id]);
+                }
+
+                filteredQuestions.forEach(q => {
                     const div = document.createElement('div');
                     div.className = 'question';
                     div.innerHTML = `
                         <p>${q.id}. ${q.question}</p>
-                        ${q.options.map((opt, idx) => `
-                            <label><input type="radio" name="q${q.id}" value="${opt}" onchange="checkAnswer(${q.id}, '${opt}', '${q.correct}')">${opt}</label>
+                        ${q.options.map((opt) => `
+                            <label><input type="radio" name="q${q.id}" value="${opt}">${opt}</label>
                         `).join('')}
+                        <button class="submit-btn" onclick="submitAnswer(${q.id}, '${q.correct}')">RESPONDER</button>
                         <div id="feedback-${q.id}" class="feedback"></div>
                     `;
                     questionsList.appendChild(div);
@@ -754,16 +923,37 @@
             }
         }
 
-        function checkAnswer(questionId, selected, correct, fromLoad = false) {
+        async function submitAnswer(questionId, correct) {
+            const selectedOption = document.querySelector(`input[name="q${questionId}"]:checked`);
             const feedbackDiv = document.getElementById(`feedback-${questionId}`);
-            const userData = loadUserData();
+            const userData = await loadUserData();
 
-            if (!fromLoad && !userData.answered[questionId]) {
-                userData.answered[questionId] = selected;
+            if (!selectedOption) {
+                feedbackDiv.innerHTML = 'Por favor, selecione uma opção antes de responder!';
+                feedbackDiv.className = 'feedback incorrect';
+                return;
+            }
+
+            const selected = selectedOption.value;
+
+            if (userData.answered[questionId]) {
+                if (userData.answered[questionId] === correct && selected !== correct) {
+                    userData.correct--;
+                } else if (userData.answered[questionId] !== correct && selected === correct) {
+                    userData.correct++;
+                }
+            } else {
                 userData.total++;
                 if (selected === correct) userData.correct++;
-                saveUserData(userData);
             }
+
+            userData.answered[questionId] = selected;
+            await saveUserData(userData);
+            checkAnswer(questionId, selected, correct);
+        }
+
+        function checkAnswer(questionId, selected, correct, fromLoad = false) {
+            const feedbackDiv = document.getElementById(`feedback-${questionId}`);
 
             if (selected === correct) {
                 feedbackDiv.innerHTML = 'RESPOSTA CORRETA';
@@ -774,11 +964,35 @@
             }
         }
 
-        function updateDesempenho() {
-            const userData = loadUserData();
+        async function updateDesempenho() {
+            const userData = await loadUserData();
             document.getElementById('total-answered').textContent = userData.total;
             document.getElementById('total-correct').textContent = userData.correct;
-            document.getElementById('accuracy').textContent = userData.total > 0 ? ((userData.correct / userData.total) * 100).toFixed(2) + '%' : '0%';
+            const accuracy = userData.total > 0 ? (userData.correct / userData.total) * 100 : 0;
+            document.getElementById('accuracy').textContent = accuracy.toFixed(2) + '%';
+
+            const ctx = document.getElementById('performance-chart').getContext('2d');
+
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Corretas', 'Erradas'],
+                    datasets: [{
+                        data: [userData.correct, userData.total - userData.correct],
+                        backgroundColor: ['#00FF00', '#FF0000'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top', labels: { color: '#E0E0E0' } },
+                        title: { display: true, text: 'Desempenho em Questões', color: '#E0E0E0' }
+                    },
+                    cutout: '70%'
+                }
+            });
         }
     </script>
 </body>
