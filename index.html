@@ -8,98 +8,141 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; }
-        body { background-color: #1C2526; color: #E0E0E0; line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { 
+            background-color: #1C2526; 
+            color: #E0E7E9; 
+            line-height: 1.6; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            font-size: 16px; 
+        }
         main { flex: 1; }
-        .navbar { position: fixed; top: 0; width: 100%; background-color: #2A2F31; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); z-index: 1000; }
-        .logo-container { display: flex; align-items: center; cursor: pointer; }
-        .logo { width: 40px; height: 40px; margin-right: 10px; border-radius: 50%; }
-        .logo-container h1 { font-size: clamp(20px, 5vw, 28px); color: #00D4FF; font-weight: 700; }
-        .menu { list-style: none; display: flex; gap: clamp(10px, 3vw, 25px); }
-        .menu li a { color: #E0E0E0; text-decoration: none; font-weight: 600; font-size: clamp(14px, 3vw, 16px); transition: color 0.3s; cursor: pointer; }
-        .menu li a:hover { color: #00D4FF; }
-        .menu-btn { display: none; background-color: #00D4FF; color: #1C2526; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        a { color: #00D4FF; text-decoration: none; transition: color 0.3s ease; }
+        a:hover { color: #E0E7E9; }
 
-        /* Estilização refinada da seção hero */
+        /* Navbar */
+        .navbar { 
+            position: fixed; 
+            top: 0; 
+            width: 100%; 
+            background-color: #2A2F31; 
+            padding: 15px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6); 
+            z-index: 1000; 
+        }
+        .logo-container { display: flex; align-items: center; cursor: pointer; }
+        .logo { width: 42px; height: 42px; margin-right: 12px; border-radius: 50%; border: 2px solid #00D4FF; }
+        .logo-container h1 { 
+            font-size: clamp(20px, 4vw, 28px); 
+            color: #00D4FF; 
+            font-weight: 700; 
+            letter-spacing: 0.5px; 
+        }
+        .menu { list-style: none; display: flex; gap: clamp(15px, 3vw, 30px); }
+        .menu li a { 
+            color: #E0E7E9; 
+            font-weight: 600; 
+            font-size: clamp(14px, 2.5vw, 16px); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+        }
+        .menu li a:hover { color: #00D4FF; }
+        .menu-btn { 
+            display: none; 
+            background-color: #00D4FF; 
+            color: #1C2526; 
+            padding: 8px 20px; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: background-color 0.3s ease, transform 0.2s ease; 
+        }
+        .menu-btn:hover { background-color: #E0E7E9; transform: scale(1.05); }
+
+        /* Hero Section */
         .hero { 
             height: 100vh; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            justify-content: flex-start; /* Começa do topo */
+            justify-content: space-between; /* Espaça o título e o formulário */
             text-align: center; 
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('pmce-background.jpg'); 
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.65)), url('pmce-background.jpg'); 
             background-size: cover; 
             background-position: center; 
             padding: 40px 20px; 
+            position: relative; 
         }
         .hero-content { 
             width: 100%; 
-            max-width: 800px; /* Limita a largura do conteúdo para melhor legibilidade */
-            padding-top: 80px; /* Espaço generoso no topo */
+            max-width: 900px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: space-between; 
+            height: 100%; 
         }
         .hero-content h2 { 
-            font-size: clamp(36px, 8vw, 56px); /* Tamanho maior para impacto */
+            font-size: clamp(18px, 3.5vw, 28px); /* Tamanho reduzido */
             color: #00D4FF; 
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8); 
-            margin-bottom: 20px; 
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9); 
             font-weight: 700; 
             line-height: 1.2; 
-        }
-        .hero-content p { 
-            font-size: clamp(18px, 4vw, 24px); 
-            max-width: 700px; 
-            margin: 0 auto 100px auto; /* Espaço grande antes do formulário */
-            color: #E0E0E0; 
-            font-weight: 300; 
+            letter-spacing: 1px; 
+            margin-top: 60px; /* Posiciona mais acima */
         }
         .access-container { 
-            max-width: 450px; 
-            width: 100%; 
-            padding: 30px; 
-            background-color: rgba(42, 47, 49, 0.95); 
-            border-radius: 20px; 
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); 
-            margin-top: auto; /* Empurra para baixo */
-            margin-bottom: 60px; /* Espaço na parte inferior */
+            max-width: 400px; /* Menor largura */
+            width: 90%; 
+            padding: 25px; 
+            background-color: rgba(42, 47, 49, 0.97); 
+            border-radius: 15px; 
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); 
+            transition: transform 0.3s ease; 
+            margin-bottom: 80px; /* Mais abaixo */
         }
+        .access-container:hover { transform: translateY(-5px); }
         .access-container input { 
             width: 100%; 
-            padding: 15px; 
-            margin-bottom: 25px; 
+            padding: 14px; /* Menor input */
+            margin-bottom: 20px; 
             border: none; 
             border-radius: 10px; 
-            background-color: #F5F5F5; 
+            background-color: #F5F7FA; 
             color: #1C2526; 
-            font-size: 16px; 
+            font-size: 15px; 
             font-weight: 500; 
-            transition: box-shadow 0.3s, background-color 0.3s; 
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); 
+            transition: box-shadow 0.3s ease, background-color 0.3s ease; 
         }
         .access-container input:focus { 
             outline: none; 
-            box-shadow: 0 0 8px rgba(0, 212, 255, 0.6); 
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.7); 
             background-color: #FFFFFF; 
         }
-        .access-container input::placeholder { 
-            color: #6B7280; 
-            font-weight: 400; 
-        }
+        .access-container input::placeholder { color: #6B7280; font-weight: 400; }
         .btn { 
             background-color: #00D4FF; 
             color: #1C2526; 
-            padding: 12px 35px; 
+            padding: 12px 35px; /* Botões menores */
             border: none; 
             border-radius: 25px; 
-            font-weight: 600; 
-            font-size: clamp(15px, 3vw, 17px); 
+            font-weight: 700; 
+            font-size: clamp(14px, 2.5vw, 16px); 
             cursor: pointer; 
-            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s; 
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; 
             width: 48%; 
         }
         .btn:hover { 
-            background-color: #E0E0E0; 
-            transform: translateY(-2px); 
-            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3); 
+            background-color: #E0E7E9; 
+            transform: translateY(-3px); 
+            box-shadow: 0 6px 15px rgba(0, 212, 255, 0.4); 
         }
         .button-container { 
             display: flex; 
@@ -107,57 +150,278 @@
             gap: 15px; 
         }
 
-        .dashboard-section, .content-section { padding: 60px 20px; text-align: center; display: none; }
-        .dashboard-section h2, .content-section h2 { font-size: clamp(28px, 6vw, 36px); color: #00D4FF; margin-bottom: 30px; }
-        .video-container { max-width: 800px; margin: 0 auto 30px; }
-        .video-container video { width: 100%; border-radius: 10px; }
-        .video-fallback { color: #E0E0E0; font-size: 16px; margin-top: 10px; }
-        .summary-container, .cronograma-container, .questoes-container, .desempenho-container { max-width: 800px; margin: 0 auto; background-color: #353B3C; padding: 20px; border-radius: 10px; text-align: left; }
-        .cronograma-container { max-width: 1000px; }
-        .summary-container h3, .cronograma-container h3, .questoes-container h3, .desempenho-container h3 { color: #00D4FF; font-size: 24px; margin-bottom: 15px; }
-        .summary-container p, .summary-container ul, .cronograma-container p, .questoes-container p, .desempenho-container p { font-size: 16px; margin-bottom: 15px; }
-        .summary-container ul, .questoes-container ul { padding-left: 20px; }
+        /* Seções Gerais */
+        .dashboard-section, .content-section { 
+            padding: 80px 20px; 
+            text-align: center; 
+            display: none; 
+            background-color: #1C2526; 
+        }
+        .dashboard-section h2, .content-section h2 { 
+            font-size: clamp(28px, 6vw, 40px); 
+            color: #00D4FF; 
+            margin-bottom: 40px; 
+            font-weight: 700; 
+            letter-spacing: 1px; 
+        }
+        .video-container { 
+            max-width: 900px; 
+            margin: 0 auto 40px; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
+            border-radius: 12px; 
+            overflow: hidden; 
+        }
+        .video-container video { width: 100%; }
+        .video-fallback { color: #E0E7E9; font-size: 14px; margin-top: 15px; font-style: italic; }
+
+        /* Containers de Conteúdo */
+        .summary-container, .cronograma-container, .questoes-container, .desempenho-container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background-color: #2A2F31; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); 
+            text-align: left; 
+        }
+        .cronograma-container { max-width: 1100px; }
+        .summary-container h3, .cronograma-container h3, .questoes-container h3, .desempenho-container h3 { 
+            color: #00D4FF; 
+            font-size: 26px; 
+            margin-bottom: 20px; 
+            font-weight: 600; 
+            letter-spacing: 0.5px; 
+        }
+        .summary-container p, .cronograma-container p, .questoes-container p, .desempenho-container p { 
+            font-size: 16px; 
+            margin-bottom: 20px; 
+            color: #E0E7E9; 
+        }
+        .summary-container ul, .questoes-container ul { padding-left: 25px; }
         .summary-container ul ul { padding-left: 40px; }
-        .cronograma-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .cronograma-table th, .cronograma-table td { padding: 12px; border: 1px solid #00D4FF; text-align: left; }
-        .cronograma-table th { background-color: #00D4FF; color: #1C2526; font-weight: bold; }
-        .cronograma-table tr:nth-child(even) { background-color: #2A2F31; }
-        .cronograma-table tr:hover { background-color: #40484A; }
-        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 20px; }
-        .calendar-day { background-color: #2A2F31; padding: 10px; border-radius: 5px; min-height: 100px; position: relative; }
-        .calendar-day span { font-weight: bold; color: #00D4FF; }
-        .calendar-day p { font-size: 14px; margin-top: 5px; }
-        .calendar-header { background-color: #00D4FF; color: #1C2526; font-weight: bold; padding: 10px; text-align: center; }
-        .filter-container { margin-bottom: 20px; }
-        .filter-container select { padding: 10px; border-radius: 5px; background-color: #E0E0E0; color: #1C2526; font-size: 16px; margin-right: 10px; }
-        .question-count { font-size: 16px; color: #00D4FF; margin-bottom: 15px; }
-        .question { margin-bottom: 20px; background-color: #2A2F31; padding: 15px; border-radius: 5px; border: 1px solid #40484A; }
-        .question p { font-weight: bold; margin-bottom: 10px; }
-        .question label { display: block; margin: 5px 0; cursor: pointer; }
-        .question input[type="radio"] { margin-right: 10px; }
-        .question .submit-btn { background-color: #00D4FF; color: #1C2526; padding: 8px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background-color 0.3s; }
-        .question .submit-btn:hover { background-color: #E0E0E0; }
-        .feedback { margin-top: 10px; font-weight: bold; }
+
+        /* Tabela do Cronograma */
+        .cronograma-table { 
+            width: 100%; 
+            border-collapse: separate; 
+            border-spacing: 0; 
+            margin-bottom: 30px; 
+            border-radius: 10px; 
+            overflow: hidden; 
+        }
+        .cronograma-table th, .cronograma-table td { 
+            padding: 15px; 
+            border: 1px solid #00D4FF; 
+            text-align: left; 
+            font-size: 15px; 
+        }
+        .cronograma-table th { 
+            background-color: #00D4FF; 
+            color: #1C2526; 
+            font-weight: 700; 
+        }
+        .cronograma-table td { background-color: #353B3C; }
+        .cronograma-table tr:nth-child(even) td { background-color: #2A2F31; }
+        .cronograma-table tr:hover td { background-color: #40484A; transition: background-color 0.3s ease; }
+
+        /* Calendário */
+        .calendar { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            gap: 8px; 
+            margin-top: 30px; 
+            width: 100%; 
+            max-width: 100%; 
+        }
+        .calendar-header { 
+            background-color: #00D4FF; 
+            color: #1C2526; 
+            font-weight: 700; 
+            padding: 10px; 
+            text-align: center; 
+            border-radius: 6px; 
+            font-size: clamp(10px, 2vw, 14px); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+        }
+        .calendar-day { 
+            background-color: #2A2F31; 
+            padding: 10px; 
+            border-radius: 6px; 
+            min-height: 100px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-start; 
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); 
+            transition: transform 0.2s ease, box-shadow 0.3s ease; 
+            overflow: hidden; 
+        }
+        .calendar-day:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3); 
+        }
+        .calendar-day span { 
+            font-weight: 700; 
+            color: #00D4FF; 
+            font-size: clamp(12px, 2.5vw, 16px); 
+            margin-bottom: 8px; 
+        }
+        .calendar-day p { 
+            font-size: clamp(10px, 2vw, 13px); 
+            color: #E0E7E9; 
+            line-height: 1.3; 
+            margin: 0; 
+            word-wrap: break-word; 
+        }
+
+        /* Questões */
+        .filter-container { margin-bottom: 25px; display: flex; gap: 15px; flex-wrap: wrap; }
+        .filter-container select { 
+            padding: 12px; 
+            border-radius: 8px; 
+            background-color: #E0E7E9; 
+            color: #1C2526; 
+            font-size: 15px; 
+            border: none; 
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); 
+            transition: box-shadow 0.3s ease; 
+        }
+        .filter-container select:focus { outline: none; box-shadow: 0 0 8px rgba(0, 212, 255, 0.6); }
+        .question-count { font-size: 16px; color: #00D4FF; margin-bottom: 20px; font-weight: 500; }
+        .question { 
+            margin-bottom: 25px; 
+            background-color: #2A2F31; 
+            padding: 20px; 
+            border-radius: 10px; 
+            border: 1px solid #40484A; 
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2); 
+        }
+        .question p { font-weight: 600; margin-bottom: 15px; font-size: 16px; }
+        .question label { display: block; margin: 8px 0; cursor: pointer; font-size: 15px; }
+        .question input[type="radio"] { margin-right: 12px; accent-color: #00D4FF; }
+        .question .submit-btn { 
+            background-color: #00D4FF; 
+            color: #1C2526; 
+            padding: 10px 25px; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            margin-top: 15px; 
+            transition: background-color 0.3s ease, transform 0.2s ease; 
+        }
+        .question .submit-btn:hover { background-color: #E0E7E9; transform: scale(1.05); }
+        .feedback { margin-top: 15px; font-weight: 600; font-size: 14px; }
         .correct { color: #00FF00; }
         .incorrect { color: #FF0000; }
-        .desempenho-container p span { color: #00D4FF; font-weight: bold; }
-        #performance-chart { max-width: 600px; margin: 20px auto; }
-        footer { background-color: #2A2F31; padding: 20px; text-align: center; border-top: 1px solid #353B3C; margin-top: auto; }
-        .footer-links { list-style: none; display: flex; justify-content: center; gap: 20px; margin-top: 10px; }
-        .footer-links li a { color: #E0E0E0; text-decoration: none; font-size: clamp(12px, 3vw, 14px); transition: color 0.3s; cursor: pointer; }
+
+        /* Desempenho */
+        .desempenho-container p { font-size: 16px; margin-bottom: 15px; }
+        .desempenho-container p span { color: #00D4FF; font-weight: 700; }
+        #performance-chart { max-width: 600px; margin: 30px auto; }
+
+        /* Footer */
+        footer { 
+            background-color: #2A2F31; 
+            padding: 20px; 
+            text-align: center; 
+            border-top: 1px solid #353B3C; 
+            margin-top: auto; 
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3); 
+        }
+        .footer-content p { 
+            font-size: 14px; 
+            margin-bottom: 15px; 
+        }
+        .footer-links { 
+            list-style: none; 
+            display: flex; 
+            justify-content: center; 
+            flex-wrap: wrap; /* Permite quebra de linha no mobile */
+            gap: 20px; 
+            margin-top: 10px; 
+        }
+        .footer-links li a { 
+            color: #E0E7E9; 
+            font-size: clamp(12px, 2vw, 14px); 
+            font-weight: 500; 
+            text-transform: uppercase; 
+            padding: 5px 10px; /* Espaçamento interno para melhor clique */
+            transition: color 0.3s ease; 
+        }
         .footer-links li a:hover { color: #00D4FF; }
+
+        /* Responsividade */
         @media (max-width: 768px) {
-            .navbar { flex-direction: row; padding: 10px; }
-            .menu { display: none; flex-direction: column; position: absolute; top: 60px; right: 20px; background-color: #2A2F31; padding: 10px; border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); }
+            .navbar { padding: 10px 20px; }
+            .logo { width: 36px; height: 36px; }
+            .menu { 
+                display: none; 
+                flex-direction: column; 
+                position: absolute; 
+                top: 60px; 
+                right: 20px; 
+                background-color: #2A2F31; 
+                padding: 15px; 
+                border-radius: 10px; 
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5); 
+                width: 200px; 
+            }
             .menu.active { display: flex; }
             .menu-btn { display: block; }
-            .calendar { grid-template-columns: repeat(2, 1fr); }
-            .hero-content { padding-top: 60px; }
-            .hero-content h2 { font-size: clamp(28px, 6vw, 40px); }
-            .hero-content p { font-size: clamp(16px, 4vw, 20px); margin-bottom: 80px; }
-            .access-container { padding: 20px; margin-bottom: 40px; }
-            .button-container { font-size: clamp(28px, 6vw, 40px); }
-            .btn { width: 100%; padding: 12px 20px; }
+            .hero { padding: 30px 15px; }
+            .hero-content h2 { font-size: clamp(16px, 3.5vw, 35px); margin-top: 40px; }
+            .access-container { 
+                max-width: 350px; 
+                padding: 20px; 
+                margin-bottom: 60px; 
+            }
+            .button-container { 
+                flex-direction: column; 
+                gap: 12px; 
+            }
+            .btn { width: 100%; padding: 10px 20px; }
+            .dashboard-section, .content-section { padding: 60px 15px; }
+            .summary-container, .cronograma-container, .questoes-container, .desempenho-container { padding: 20px; }
+            .cronograma-table th, .cronograma-table td { padding: 10px; font-size: 14px; }
+            .calendar { gap: 6px; }
+            .calendar-header { padding: 8px; font-size: clamp(9px, 1.8vw, 12px); }
+            .calendar-day { padding: 8px; min-height: 80px; }
+            .calendar-day span { font-size: clamp(10px, 2vw, 14px); margin-bottom: 6px; }
+            .calendar-day p { font-size: clamp(8px, 1.8vw, 11px); line-height: 1.2; }
+            .footer-links { 
+                flex-direction: column; 
+                gap: 10px; /* Espaçamento vertical no mobile */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar { padding: 8px 15px; }
+            .logo { width: 32px; height: 32px; }
+            .logo-container h1 { font-size: clamp(18px, 4vw, 24px); }
+            .menu { width: 180px; top: 50px; right: 15px; }
+            .hero { padding: 20px 10px; }
+            .hero-content h2 { font-size: clamp(14px, 3.5vw, 20px); margin-top: 30px; }
+            .access-container { max-width: 300px; padding: 15px; margin-bottom: 50px; }
+            .access-container input { padding: 12px; margin-bottom: 15px; font-size: 13px; }
+            .btn { padding: 10px 15px; font-size: 14px; }
+            .dashboard-section h2, .content-section h2 { font-size: clamp(24px, 6vw, 32px); }
+            .video-container { max-width: 100%; }
+            .summary-container, .cronograma-container, .questoes-container, .desempenho-container { max-width: 100%; }
+            .cronograma-table th, .cronograma-table td { font-size: 12px; padding: 8px; }
+            .calendar { gap: 4px; }
+            .calendar-header { padding: 6px; font-size: clamp(8px, 1.6vw, 10px); }
+            .calendar-day { padding: 6px; min-height: 60px; }
+            .calendar-day span { font-size: clamp(9px, 1.8vw, 12px); margin-bottom: 4px; }
+            .calendar-day p { font-size: clamp(7px, 1.6vw, 10px); }
+            .filter-container select { padding: 10px; font-size: 14px; }
+            .question { padding: 15px; }
+            .question p { font-size: 14px; }
+            .question label { font-size: 13px; }
+            .question .submit-btn { padding: 8px 20px; }
+            .footer-content p { font-size: 12px; margin-bottom: 10px; }
+            .footer-links { gap: 8px; }
+            .footer-links li a { font-size: clamp(11px, 1.8vw, 13px); padding: 4px 8px; }
         }
     </style>
 </head>
@@ -183,7 +447,6 @@
         <section class="hero" id="hero">
             <div class="hero-content">
                 <h2>Conquiste sua vaga na PMCE com a RenitenteConcursos</h2>
-                <p>Milhares de questões, simulados e cursos focados no concurso da Polícia Militar do Ceará.</p>
                 <div class="access-container">
                     <input type="text" id="access-code" placeholder="Digite seu Código de Acesso">
                     <div class="button-container">
@@ -201,7 +464,7 @@
                     <source src="edital.mp4" type="video/mp4">
                     Seu navegador não suporta o elemento de vídeo.
                 </video>
-                <p class="video-fallback">Se o vídeo não carregar, verifique se o arquivo <code>inicio.mp4</code> está no mesmo diretório que este HTML ou ajuste o caminho no código.</p>
+                <p class="video-fallback">Se o vídeo não carregar, verifique se o arquivo <code>edital.mp4</code> está no diretório correto ou ajuste o caminho.</p>
             </div>
             <div class="summary-container">
                 <h3>Resumão Detalhado do Edital PM CE 2025</h3>
@@ -210,10 +473,10 @@
                 <ul>
                     <li><strong>Status:</strong> Edital publicado</li>
                     <li><strong>Banca Organizadora:</strong> CEV/UECE (FUNECE)</li>
-                    <li><strong>Vagas Imediatas:</strong> 1.000 (800 ampla concorrência, 200 PPP - Política de Promoção da Igualdade Racial para negros e pardos)</li>
+                    <li><strong>Vagas Imediatas:</strong> 1.000 (800 ampla concorrência, 200 PPP)</li>
                     <li><strong>Cadastro de Reserva:</strong> 500 (400 ampla concorrência, 100 PPP)</li>
                     <li><strong>Salário Inicial:</strong> R$ 5.568,64 (após curso de formação)</li>
-                    <li><strong>Requisitos:</strong> 
+                    <li><strong>Requisitos:</strong>
                         <ul>
                             <li>Nível médio completo</li>
                             <li>Idade entre 18 e 29 anos na data da inscrição</li>
@@ -221,134 +484,87 @@
                             <li>Carteira Nacional de Habilitação (CNH) categoria B</li>
                         </ul>
                     </li>
-                    <li><strong>Inscrições:</strong> De 22 de abril a 11 de maio de 2025, no site <a href="https://cev.uece.br" style="color: #00D4FF;">cev.uece.br</a></li>
+                    <li><strong>Inscrições:</strong> De 22 de abril a 11 de maio de 2025, no site <a href="https://cev.uece.br">cev.uece.br</a></li>
                     <li><strong>Taxa de Inscrição:</strong> R$ 180,00</li>
                     <li><strong>Data da Prova:</strong> A ser confirmada no cronograma oficial</li>
                 </ul>
                 <h3>Prova Objetiva</h3>
-                <p>A primeira etapa é a <strong>Prova Objetiva</strong>, eliminatória e classificatória, composta por <strong>100 questões</strong> de múltipla escolha, divididas em dois blocos:</p>
+                <p>A primeira etapa é a <strong>Prova Objetiva</strong>, composta por <strong>100 questões</strong> de múltipla escolha, divididas em dois blocos:</p>
                 <ul>
                     <li><strong>Conhecimentos Básicos (40 questões):</strong>
                         <ul>
-                            <li>Língua Portuguesa (12 questões): Interpretação de texto, gramática, ortografia</li>
-                            <li>Matemática/Raciocínio Lógico (8 questões): Operações básicas, porcentagem, lógica</li>
-                            <li>Atualidades (8 questões): Fatos recentes do Brasil e do Ceará</li>
-                            <li>Informática (6 questões): Windows, Office, internet</li>
-                            <li>Segurança Pública (6 questões): Conceitos básicos e legislação</li>
+                            <li>Língua Portuguesa (12 questões)</li>
+                            <li>Matemática/Raciocínio Lógico (8 questões)</li>
+                            <li>Atualidades (8 questões)</li>
+                            <li>Informática (6 questões)</li>
+                            <li>Segurança Pública (6 questões)</li>
                         </ul>
                     </li>
                     <li><strong>Conhecimentos Específicos (60 questões):</strong>
                         <ul>
-                            <li>Direito Constitucional (15 questões): Direitos fundamentais, organização do Estado</li>
-                            <li>Direito Penal (15 questões): Crimes, penas, Código Penal</li>
-                            <li>Direito Processual Penal (10 questões): Inquérito, prisão, provas</li>
-                            <li>Legislação Extravagante (10 questões): Estatuto da Criança, Lei Maria da Penha</li>
-                            <li>Direitos Humanos (10 questões): Declaração Universal, tratados</li>
+                            <li>Direito Constitucional (15 questões)</li>
+                            <li>Direito Penal (15 questões)</li>
+                            <li>Direito Processual Penal (10 questões)</li>
+                            <li>Legislação Extravagante (10 questões)</li>
+                            <li>Direitos Humanos (10 questões)</li>
                         </ul>
                     </li>
                 </ul>
-                <p><strong>Pontuação Mínima:</strong> 20 acertos em Conhecimentos Básicos (50%) e 30 em Conhecimentos Específicos (50%). Cada questão vale 1 ponto.</p>
+                <p><strong>Pontuação Mínima:</strong> 20 acertos em Conhecimentos Básicos (50%) e 30 em Conhecimentos Específicos (50%).</p>
                 <h3>Etapas do Concurso</h3>
-                <p>O concurso possui <strong>5 etapas</strong>, todas eliminatórias, exceto a prova objetiva, que também classifica:</p>
+                <p>O concurso possui <strong>5 etapas</strong>:</p>
                 <ul>
-                    <li><strong>1. Prova Objetiva:</strong> 100 questões, conforme detalhado acima.</li>
-                    <li><strong>2. Exame de Saúde:</strong> Avaliação médica, odontológica e toxicológica.
-                        <ul>
-                            <li>Exames exigidos: Hemograma, glicemia, exame de urina, audiometria, oftalmológico, entre outros.</li>
-                            <li>Candidatos com tatuagens visíveis podem ser avaliados caso representem apologia a crimes ou violência.</li>
-                        </ul>
-                    </li>
-                    <li><strong>3. Avaliação Psicológica:</strong> Testes psicotécnicos para verificar:
-                        <ul>
-                            <li>Controle emocional e impulsividade</li>
-                            <li>Capacidade de raciocínio e concentração</li>
-                            <li>Perfil de liderança e trabalho em equipe</li>
-                            <li>Aptidão para lidar com situações de estresse</li>
-                        </ul>
-                        <p>Baseada em testes como PMK, Palográfico e entrevistas (quando necessário).</p>
-                    </li>
-                    <li><strong>4. Teste de Aptidão Física (TAF):</strong> Composto por 4 exercícios com índices mínimos:
-                        <ul>
-                            <li><strong>Corrida de 12 minutos:</strong>
-                                <ul>
-                                    <li>Homens: 2.400 metros</li>
-                                    <li>Mulheres: 2.000 metros</li>
-                                </ul>
-                            </li>
-                            <li><strong>Barra:</strong>
-                                <ul>
-                                    <li>Homens: 6 repetições dinâmicas (subir e descer completamente)</li>
-                                    <li>Mulheres: 10 segundos em suspensão estática</li>
-                                </ul>
-                            </li>
-                            <li><strong>Abdominal:</strong> Tipo <em>remador</em> (deitado, tronco elevado a 45º, mãos na nuca):
-                                <ul>
-                                    <li>Homens: 42 repetições em 1 minuto</li>
-                                    <li>Mulheres: 38 repetições em 1 minuto</li>
-                                </ul>
-                            </li>
-                            <li><strong>Corrida de 50 metros:</strong>
-                                <ul>
-                                    <li>Homens: Até 9 segundos</li>
-                                    <li>Mulheres: Até 10 segundos</li>
-                                </ul>
-                            </li>
-                        </ul>
-                        <p>Candidatos têm duas tentativas por exercício, exceto na corrida de 12 minutos (uma tentativa).</p>
-                    </li>
-                    <li><strong>5. Investigação Social:</strong> Análise da vida pregressa e idoneidade moral.
-                        <ul>
-                            <li>Verifica antecedentes criminais, processos judiciais e comportamento social.</li>
-                            <li>Documentos como certidões negativas são exigidos.</li>
-                        </ul>
-                    </li>
+                    <li><strong>1. Prova Objetiva</strong></li>
+                    <li><strong>2. Exame de Saúde</strong></li>
+                    <li><strong>3. Avaliação Psicológica</strong></li>
+                    <li><strong>4. Teste de Aptidão Física (TAF)</strong></li>
+                    <li><strong>5. Investigação Social</strong></li>
                 </ul>
                 <h3>Curso de Formação</h3>
-                <p>Aprovados em todas as etapas passam pelo <strong>Curso de Formação Profissional</strong>, com duração de cerca de 6 meses, em regime de dedicação exclusiva. Durante o curso, recebem uma bolsa de aproximadamente 50% do salário inicial.</p>
-                <p><strong>Grupo de Estudos:</strong> Acesse agora o <a href="#" style="color: #00D4FF;">Grupo de Estudos para o Concurso PM CE</a> e prepare-se com quem entende do assunto!</p>
+                <p>Aprovados passam pelo <strong>Curso de Formação Profissional</strong>, com duração de cerca de 6 meses.</p>
+                <p><strong>Grupo de Estudos:</strong> Acesse o <a href="#">Grupo de Estudos para o Concurso PM CE</a>.</p>
             </div>
         </section>
 
         <section class="content-section" id="sobre-nos">
             <h2>Sobre Nós</h2>
-            <p>A RenitenteConcursos é uma plataforma dedicada à preparação de candidatos para concursos públicos, com foco especial no Concurso da Polícia Militar do Ceará (PM CE). Nosso objetivo é oferecer ferramentas práticas e conteúdos atualizados para que você conquiste sua vaga com confiança.</p>
-            <p>Fundada por uma equipe de especialistas em concursos públicos, a RenitenteConcursos nasceu da percepção de que muitos candidatos precisam de um suporte direcionado e acessível. Aqui, você encontra vídeos explicativos, resumos detalhados de editais e uma abordagem focada nas necessidades reais dos concurseiros.</p>
-            <p>Nossa missão é transformar seu sonho em realidade, oferecendo um caminho claro e eficiente rumo à aprovação. Junte-se a nós e faça parte dessa jornada!</p>
+            <div class="summary-container">
+                <p>A RenitenteConcursos é uma plataforma dedicada à preparação para concursos públicos, com foco no Concurso da Polícia Militar do Ceará (PM CE). Nosso objetivo é oferecer ferramentas práticas e conteúdos atualizados para sua aprovação.</p>
+                <p>Fundada por especialistas, buscamos suprir a necessidade de suporte direcionado e acessível aos concurseiros.</p>
+            </div>
         </section>
 
         <section class="content-section" id="politica-privacidade">
             <h2>Políticas de Privacidade</h2>
-            <p>Na RenitenteConcursos, valorizamos sua privacidade e estamos comprometidos em proteger suas informações. Esta política explica como tratamos os dados coletados em nossa plataforma:</p>
-            <ul>
-                <li><strong>Coleta de Dados:</strong> Armazenamos apenas os códigos de acesso e dados de desempenho (questões respondidas e acertos), sem coletar informações pessoais como nome, email ou CPF, a menos que você nos forneça voluntariamente.</li>
-                <li><strong>Uso dos Dados:</strong> Os dados são usados exclusivamente para validar seu acesso e acompanhar seu desempenho na plataforma.</li>
-                <li><strong>Compartilhamento:</strong> Não compartilhamos seus dados com terceiros, exceto se exigido por lei.</li>
-                <li><strong>Segurança:</strong> Utilizamos o Firebase Realtime Database com autenticação anônima para armazenar dados na nuvem de forma segura.</li>
-                <li><strong>Cookies:</strong> Não utilizamos cookies ou tecnologias de rastreamento.</li>
-                <li><strong>Alterações:</strong> Esta política pode ser atualizada, e as mudanças serão comunicadas na plataforma.</li>
-            </ul>
-            <p>Para dúvidas, entre em contato pelo email: <a href="mailto:contato@renitenteconcursos.com" style="color: #00D4FF;">contato@renitenteconcursos.com</a>.</p>
+            <div class="summary-container">
+                <p>Valorizamos sua privacidade e protegemos seus dados:</p>
+                <ul>
+                    <li><strong>Coleta:</strong> Apenas códigos de acesso e dados de desempenho.</li>
+                    <li><strong>Uso:</strong> Validação de acesso e acompanhamento de desempenho.</li>
+                    <li><strong>Segurança:</strong> Firebase com autenticação anônima.</li>
+                </ul>
+                <p>Contato: <a href="mailto:contato@renitenteconcursos.com">contato@renitenteconcursos.com</a>.</p>
+            </div>
         </section>
 
         <section class="content-section" id="termos-uso">
             <h2>Termos de Uso</h2>
-            <p>Ao acessar a RenitenteConcursos, você concorda com os seguintes termos:</p>
-            <ul>
-                <li><strong>Acesso:</strong> O acesso é restrito a usuários com códigos de acesso válidos, que funcionam como contas individuais.</li>
-                <li><strong>Uso do Conteúdo:</strong> Todo o conteúdo (vídeos, questões, cronogramas) é protegido por direitos autorais e destinado ao uso pessoal.</li>
-                <li><strong>Responsabilidade:</strong> A RenitenteConcursos não se responsabiliza por informações incorretas no edital; consulte o documento oficial da CEV/UECE.</li>
-                <li><strong>Conduta:</strong> É proibido tentar burlar o sistema ou compartilhar códigos de acesso.</li>
-                <li><strong>Alterações:</strong> Podemos modificar os termos, com aviso na plataforma.</li>
-                <li><strong>Encerramento:</strong> O acesso pode ser suspenso em caso de violação destes termos.</li>
-            </ul>
-            <p>Para mais informações, entre em contato: <a href="mailto:contato@renitenteconcursos.com" style="color: #00D4FF;">contato@renitenteconcursos.com</a>.</p>
+            <div class="summary-container">
+                <p>Ao acessar a plataforma, você concorda com:</p>
+                <ul>
+                    <li><strong>Acesso:</strong> Restrito a códigos válidos.</li>
+                    <li><strong>Uso:</strong> Conteúdo para uso pessoal.</li>
+                    <li><strong>Conduta:</strong> Proibido burlar o sistema.</li>
+                </ul>
+                <p>Contato: <a href="mailto:contato@renitenteconcursos.com">contato@renitenteconcursos.com</a>.</p>
+            </div>
         </section>
 
         <section class="content-section" id="cronograma-section">
             <h2>Cronogramas</h2>
             <div class="cronograma-container">
                 <h3>Cronograma Mensal - Preparação PM CE 2025</h3>
-                <p>Segue abaixo o cronograma sugerido para os meses de preparação até a prova:</p>
+                <p>Planejamento sugerido até a prova:</p>
                 <table class="cronograma-table">
                     <thead>
                         <tr>
@@ -358,46 +574,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1ª (1-7 Abr)</td>
-                            <td>Estudo Teórico + 20 Questões</td>
-                            <td>Língua Portuguesa</td>
-                        </tr>
-                        <tr>
-                            <td>2ª (8-14 Abr)</td>
-                            <td>Estudo Teórico + 20 Questões</td>
-                            <td>Matemática/Raciocínio Lógico</td>
-                        </tr>
-                        <tr>
-                            <td>3ª (15-21 Abr)</td>
-                            <td>Revisão + 30 Questões</td>
-                            <td>Atualidades + Informática</td>
-                        </tr>
-                        <tr>
-                            <td>4ª (22-28 Abr)</td>
-                            <td>Simulado (50 questões)</td>
-                            <td>Conhecimentos Básicos</td>
-                        </tr>
-                        <tr>
-                            <td>1ª (1-7 Mai)</td>
-                            <td>Estudo Teórico + 30 Questões</td>
-                            <td>Direito Constitucional</td>
-                        </tr>
-                        <tr>
-                            <td>2ª (8-14 Mai)</td>
-                            <td>Estudo Teórico + 30 Questões</td>
-                            <td>Direito Penal</td>
-                        </tr>
-                        <tr>
-                            <td>3ª (15-21 Mai)</td>
-                            <td>Revisão + 40 Questões</td>
-                            <td>Direito Processual Penal</td>
-                        </tr>
-                        <tr>
-                            <td>4ª (22-28 Mai)</td>
-                            <td>Simulado (100 questões)</td>
-                            <td>Todas as Disciplinas</td>
-                        </tr>
+                        <tr><td>1ª (1-7 Abr)</td><td>Estudo Teórico + 20 Questões</td><td>Língua Portuguesa</td></tr>
+                        <tr><td>2ª (8-14 Abr)</td><td>Estudo Teórico + 20 Questões</td><td>Matemática/Raciocínio Lógico</td></tr>
+                        <tr><td>3ª (15-21 Abr)</td><td>Revisão + 30 Questões</td><td>Atualidades + Informática</td></tr>
+                        <tr><td>4ª (22-28 Abr)</td><td>Simulado (50 questões)</td><td>Conhecimentos Básicos</td></tr>
+                        <tr><td>1ª (1-7 Mai)</td><td>Estudo Teórico + 30 Questões</td><td>Direito Constitucional</td></tr>
+                        <tr><td>2ª (8-14 Mai)</td><td>Estudo Teórico + 30 Questões</td><td>Direito Penal</td></tr>
+                        <tr><td>3ª (15-21 Mai)</td><td>Revisão + 40 Questões</td><td>Direito Processual Penal</td></tr>
+                        <tr><td>4ª (22-28 Mai)</td><td>Simulado (100 questões)</td><td>Todas as Disciplinas</td></tr>
                     </tbody>
                 </table>
                 <h3>Calendário de Estudos - Abril 2025 (PMCE)</h3>
@@ -457,10 +641,10 @@
                     </select>
                     <select id="status-filter" onchange="filterQuestions()">
                         <option value="ALL" selected>Todas</option>
-                        <option value="RESOLVED">Questões Resolvidas</option>
-                        <option value="CORRECT">Questões Corretas</option>
-                        <option value="INCORRECT">Questões Erradas</option>
-                        <option value="UNRESOLVED">Questões Não Resolvidas</option>
+                        <option value="RESOLVED">Resolvidas</option>
+                        <option value="CORRECT">Corretas</option>
+                        <option value="INCORRECT">Erradas</option>
+                        <option value="UNRESOLVED">Não Resolvidas</option>
                     </select>
                 </div>
                 <div id="question-count" class="question-count"></div>
@@ -516,26 +700,11 @@
             { id: 1, question: "Qual é a capital do Brasil?", options: ["São Paulo", "Rio de Janeiro", "Brasília", "Salvador"], correct: "Brasília" },
             { id: 2, question: "2 + 2 é igual a:", options: ["3", "4", "5", "6"], correct: "4" },
             { id: 3, question: "Qual é o maior planeta do Sistema Solar?", options: ["Terra", "Marte", "Júpiter", "Saturno"], correct: "Júpiter" },
-            { id: 4, question: "Quem escreveu 'Dom Casmurro'?", options: ["Machado de Assis", "José de Alencar", "Clarice Lispector", " Guimarães Rosa"], correct: "Machado de Assis" },
-            { id: 5, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
-            { id: 6, question: "Qual é o maior oceano do mundo?", options: ["Atlântico", "Índico", "Ártico", "Pacífico"], correct: "Pacífico" },
-            { id: 7, question: "Quantos continentes habitados existem?", options: ["4", "5", "6", "7"], correct: "6" },
-            { id: 8, question: "Qual é a fórmula da água?", options: ["H2O", "CO2", "NaCl", "O2"], correct: "H2O" },
-            { id: 9, question: "Quem pintou a Mona Lisa?", options: ["Van Gogh", "Picasso", "Leonardo da Vinci", "Michelangelo"], correct: "Leonardo da Vinci" },
-            { id: 10, question: "Qual é o idioma oficial do Brasil?", options: ["Espanhol", "Inglês", "Português", "Francês"], correct: "Português" },
-            { id: 11, question: "Qual é 10% de 200?", options: ["10", "20", "30", "40"], correct: "20" },
-            { id: 12, question: "Qual é o símbolo do ferro?", options: ["Fe", "Fr", "Fo", "Fi"], correct: "Fe" },
-            { id: 13, question: "Quem descobriu o Brasil?", options: ["Cristóvão Colombo", "Pedro Álvares Cabral", "Vasco da Gama", "Fernão de Magalhães"], correct: "Pedro Álvares Cabral" },
-            { id: 14, question: "Qual é o menor país do mundo?", options: ["Mônaco", "Vaticano", "San Marino", "Liechtenstein"], correct: "Vaticano" },
-            { id: 15, question: "Quantos lados tem um triângulo?", options: ["2", "3", "4", "5"], correct: "3" },
-            { id: 16, question: "Qual é a raiz quadrada de 16?", options: ["2", "4", "6", "8"], correct: "4" },
-            { id: 17, question: "Qual planeta é conhecido como o planeta vermelho?", options: ["Vênus", "Marte", "Júpiter", "Mercúrio"], correct: "Marte" },
-            { id: 18, question: "Qual é o plural de 'cão'?", options: ["Cães", "Cãos", "Cãis", "Cans"], correct: "Cães" },
-            { id: 19, question: "Qual é o oposto de 'alto'?", options: ["Grande", "Baixo", "Longo", "Curto"], correct: "Baixo" },
-            { id: 20, question: "Qual é 5 x 6?", options: ["25", "30", "35", "40"], correct: "30" },
+            { id: 4, question: "Quem escreveu 'Dom Casmurro'?", options: ["Machado de Assis", "José de Alencar", "Clarice Lispector", "Guimarães Rosa"], correct: "Machado de Assis" },
+            { id: 5, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" }
         ];
 
-        for (let i = 21; i <= 100; i++) {
+        for (let i = 6; i <= 100; i++) {
             massificacaoQuestions.push({
                 id: i,
                 question: `Questão de exemplo ${i}: Qual é ${i % 10} + ${i % 10}?`,
@@ -617,7 +786,7 @@
 
         function checkVideo() {
             const video = document.querySelector('video');
-            video.addEventListener('error', () => console.error('Erro ao carregar o vídeo. Verifique o caminho ou formato.'));
+            video.addEventListener('error', () => console.error('Erro ao carregar o vídeo.'));
             video.addEventListener('loadeddata', () => console.log('Vídeo carregado com sucesso!'));
         }
 
@@ -629,7 +798,7 @@
                 if (callback) callback(userData);
             }, (error) => {
                 console.error('Erro ao carregar dados:', error);
-                alert('Erro ao conectar com o banco de dados. Tente novamente mais tarde.');
+                alert('Erro ao conectar com o banco de dados.');
             });
         }
 
@@ -638,7 +807,7 @@
             const userRef = db.ref(`users/user_${currentUserCode}`);
             userRef.set(userData).catch(error => {
                 console.error('Erro ao salvar dados:', error);
-                alert('Erro ao salvar dados. Tente novamente.');
+                alert('Erro ao salvar dados.');
             });
         }
 
@@ -691,7 +860,7 @@
                     });
                 } else {
                     questionCount.innerHTML = `Exibidas: 0 questões (${banca} - Todas)`;
-                    questionsList.innerHTML = `<p>Questões para a banca ${banca} ainda não estão disponíveis. Tente "Massificação" para praticar!</p>`;
+                    questionsList.innerHTML = `<p>Questões para a banca ${banca} ainda não estão disponíveis.</p>`;
                 }
             });
         }
@@ -701,7 +870,7 @@
             const feedbackDiv = document.getElementById(`feedback-${questionId}`);
 
             if (!selectedOption) {
-                feedbackDiv.innerHTML = 'Por favor, selecione uma opção antes de responder!';
+                feedbackDiv.innerHTML = 'Selecione uma opção antes de responder!';
                 feedbackDiv.className = 'feedback incorrect';
                 return;
             }
@@ -729,7 +898,6 @@
 
         function checkAnswer(questionId, selected, correct, fromLoad = false) {
             const feedbackDiv = document.getElementById(`feedback-${questionId}`);
-
             if (selected === correct) {
                 feedbackDiv.innerHTML = 'RESPOSTA CORRETA';
                 feedbackDiv.className = 'feedback correct';
@@ -747,7 +915,6 @@
                 document.getElementById('accuracy').textContent = accuracy.toFixed(2) + '%';
 
                 const ctx = document.getElementById('performance-chart').getContext('2d');
-
                 if (chart) chart.destroy();
                 chart = new Chart(ctx, {
                     type: 'doughnut',
@@ -762,8 +929,8 @@
                     options: {
                         responsive: true,
                         plugins: {
-                            legend: { position: 'top', labels: { color: '#E0E0E0' } },
-                            title: { display: true, text: 'Desempenho em Questões', color: '#E0E0E0' }
+                            legend: { position: 'top', labels: { color: '#E0E7E9' } },
+                            title: { display: true, text: 'Desempenho em Questões', color: '#E0E7E9' }
                         },
                         cutout: '70%'
                     }
