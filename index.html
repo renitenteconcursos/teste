@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RenitenteConcursos - Prepare-se para o PMCE</title>
+    <title>RenitenteConcursos - Prepare-se para a PMCE</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -687,11 +687,17 @@
                 <h3>Filtre por Banca e Status</h3>
                 <div class="filter-container">
                     <select id="banca-filter" onchange="filterQuestions()">
-                        <option value="FUNECE">FUNECE</option>
-                        <option value="CESGRANRIO">CESGRANRIO</option>
-                        <option value="IDECAN">IDECAN</option>
-                        <option value="INSTITUTO AOCP">INSTITUTO AOCP</option>
-                        <option value="MASSIFICACAO" selected>MASSIFICAÇÃO</option>
+                        <option value="PORTUGUÊS">PORTUGUÊS</option>
+                        <option value="RACIOCÍNIO LÓGICO">RACIOCÍNIO LÓGICO</option>
+                        <option value="ATUALIDADES">ATUALIDADES</option>
+                        <option value="HISTÓRIA">HISTÓRIA</option>
+                        <option value="ADM PÚBLICA x ÉTICA" selected>ADM PÚBLICA x ÉTICA</option>
+                        <option value="DIREITO CONSTITUCIONAL" selected>DIREITO CONSTITUCIONAL</option>
+                        <option value="DIREITOS HUMANOS" selected>DIREITOS HUMANOS</option>
+                        <option value="PENAL MILITAR" selected>PENAL MILITAR</option>
+                        <option value="DIREITO PENAL" selected>DIREITO PENAL</option>
+                        <option value="CRIMINOLOGIA" selected>CRIMINOLOGIA</option>
+                        <option value="SEGURANÇA PÚBLICA" selected>SEGURANÇA PÚBLICA</option>
                     </select>
                     <select id="status-filter" onchange="filterQuestions()">
                         <option value="ALL" selected>Todas</option>
@@ -1033,12 +1039,58 @@
 
         let currentUserCode = null;
         let chart = null;
-        const massificacaoQuestions = [
-            { id: 1, question: "Qual é a capital do Brasil?", options: ["São Paulo", "Rio de Janeiro", "Brasília", "Salvador"], correct: "Brasília" },
+        const portuguesQuestions = [
+            {
+  id: 1,
+  question: "Ao longo do texto, a autora traça um perfil de Alexander Soljenítsin. De acordo com o texto, podemos afirmar que ele",
+  text: "PROFETA DO BEM E DO MAL\nVILMA GRYZINSKI\nAlexander Soljenítsin enfrentou a URSS e detestou o Ocidente\n\nDentro da grande tradição russa, Alexander Soljenítsin foi um fabuloso escritor, mas também um profeta, uma combinação de mente e espírito capazes de captar os círculos da água eterna que se projetam para o que achamos ser o futuro. “Na percepção do meu coração, não existe espaço para um conflito Rússia-Ucrânia e se, Deus nos livre, a questão chegar a isso, posso afirmar com certeza: jamais, em nenhuma circunstância, tomarei parte num confronto russo-ucraniano ou permitirei que meus filhos o façam - não importa o quanto os imprudentes destemperados tentem nos arrastar para isso.” Ele escreveu isso em 1981. Tinha convivido com prisioneiros ucranianos no Gulag e aprendido com seu sofrimento sob Stálin.\n\nEra também impossível. Expulso pela União Soviética em 1974, ele deveria ter se extasiado com o Ocidente, chorado diante da fartura das prateleiras de um supermercado americano - aconteceu com outros exilados do comunismo - e louvado o papel dos Estados Unidos na defesa das liberdades. Fez exatamente o contrário. Sua crítica ao modelo de democracia liberal é uma das mais radicais que existem. No famoso discurso de abertura do ano letivo em Harvard, em 1978, ele fez considerações que merecem ser lembradas cada vez que procuramos um olhar complexo e diversificado sobre o mundo. Numa crítica premonitória, anotou que, em reação ao passado de colonialismo, “as relações com o antigo mundo colonial viraram para o extremo oposto e o mundo ocidental agora frequentemente exibe um excesso de obsequiosidade” com os ex-colonizados - alguém já viu a nova onda “descolonizadora” nos círculos intelectuais das esquerdas hoje em dia? Enfiando a faca mais fundo, o escritor anotou que “um declínio da coragem pode ser a característica mais marcante que um observador de fora nota no Ocidente hoje”. Mencionou a coragem cívica. Imaginem a cara da fina flor de Harvard ao ouvir que “esse declínio na coragem é particularmente perceptível entre as elites governantes e intelectuais”. Teve mais: “A defesa dos direitos individuais atingiu tais extremos que tornam a sociedade como um todo indefesa diante de certos indivíduos”. Na sua visão, havia um excesso de condescendência com o crime - alguém já ouviu falar em tratar criminosos como vítimas da sociedade?\n\nTeria o grande Soljenítsin deixado de perceber as nuances do pensamento ocidental, as fraquezas que fazem sua força e sua criatividade, a capacidade de regeneração mesmo de sociedades altamente consumistas ou excessivamente indulgentes? “A inclinação da liberdade na direção do mal aconteceu gradualmente, mas evidentemente deriva de um conceito humanista segundo o qual o homem - o mestre desse mundo - não carrega nenhum mal dentro de si e todos os defeitos da vida são causados por sistemas sociais equivocados que, portanto, precisam ser corrigidos.”\n\nQual intelectual hoje ousaria falar em mal ou bem? Soljenítsin falava. Escreveu ele em Arquipélago Gulag: “Gradualmente me foi revelado que a linha separando o bem do mal passa, não entre estados, não entre classes, nem entre partidos políticos - mas diretamente através de cada coração humano. Dentro de nós, oscila com o passar dos anos. E mesmo nos corações tomados pelo mal, uma pequena cabeça de ponte do bem permanece. E mesmo no melhor dos corações, permanece um canto intacto do mal”. Não é de arrepiar?\n\nRevista Veja – 27/09/2024",
+  options: [
+    "era um intelectual que rejeitava as ideias de bem e de mal.",
+    "era um homem russo descendente de ucranianos.",
+    "não percebia as nuances do pensamento ocidental.",
+    "não se deixava impressionar facilmente."
+  ],
+  correct: "não se deixava impressionar facilmente."
+}
             { id: 2, question: "2 + 2 é igual a:", options: ["3", "4", "5", "6"], correct: "4" },
             { id: 3, question: "Qual é o maior planeta do Sistema Solar?", options: ["Terra", "Marte", "Júpiter", "Saturno"], correct: "Júpiter" },
             { id: 4, question: "Quem escreveu 'Dom Casmurro'?", options: ["Machado de Assis", "José de Alencar", "Clarice Lispector", "Guimarães Rosa"], correct: "Machado de Assis" },
-            { id: 5, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" }
+            { id: 5, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 6, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 7, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 8, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 9, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 10, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 11, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 12, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 13, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 14, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 15, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 16, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 17, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 18, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 19, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 20, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 21, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 22, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 23, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 24, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 25, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 26, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 27, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 28, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 29, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 30, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 31, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 32, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 33, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 34, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 35, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 36, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 37, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 38, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 39, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" },
+        { id: 40, question: "Qual é o elemento químico representado por 'O'?", options: ["Ouro", "Oxigênio", "Ósmio", "Oxalato"], correct: "Oxigênio" }
         ];
 
         for (let i = 6; i <= 100; i++) {
