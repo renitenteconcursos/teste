@@ -1084,7 +1084,7 @@
         ];
 
         for (let i = 6; i <= 100; i++) {
-            massificacaoQuestions.push({
+            portuguesQuestions.push({
                 id: i,
                 question: `Questão de exemplo ${i}: Qual é ${i % 10} + ${i % 10}?`,
                 options: [`${i % 10 + i % 10 - 1}`, `${i % 10 + i % 10}`, `${i % 10 + i % 10 + 1}`, `${i % 10 + i % 10 + 2}`],
@@ -1203,16 +1203,16 @@
                     let statusText = '';
 
                     if (status === 'RESOLVED') {
-                        filteredQuestions = massificacaoQuestions.filter(q => userData.answered[q.id]);
+                        filteredQuestions = portuguesQuestions.filter(q => userData.answered[q.id]);
                         statusText = 'Resolvidas';
                     } else if (status === 'CORRECT') {
-                        filteredQuestions = massificacaoQuestions.filter(q => userData.answered[q.id] && userData.answered[q.id] === q.correct);
+                        filteredQuestions = portuguesQuestions.filter(q => userData.answered[q.id] && userData.answered[q.id] === q.correct);
                         statusText = 'Corretas';
                     } else if (status === 'INCORRECT') {
-                        filteredQuestions = massificacaoQuestions.filter(q => userData.answered[q.id] && userData.answered[q.id] !== q.correct);
+                        filteredQuestions = portuguesQuestions.filter(q => userData.answered[q.id] && userData.answered[q.id] !== q.correct);
                         statusText = 'Erradas';
                     } else if (status === 'UNRESOLVED') {
-                        filteredQuestions = massificacaoQuestions.filter(q => !userData.answered[q.id]);
+                        filteredQuestions = portuguesQuestions.filter(q => !userData.answered[q.id]);
                         statusText = 'Não Resolvidas';
                     } else {
                         statusText = 'Todas';
